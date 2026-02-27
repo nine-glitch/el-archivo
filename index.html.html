@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Archivo</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #070605;
+  --card: #0f0e0c;
+  --card2: #141210;
+  --border: #1e1c18;
+  --border2: #2a2620;
+  --gold: #b89a5c;
+  --gold2: #7a6438;
+  --gold3: #b89a5c1a;
+  --text: #e0d8c8;
+  --text2: #9a9080;
+  --text3: #504840;
+  --red: #8b3a2a;
+  --green: #3a6a4a;
+  --blue: #2a4a6a;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 18px;
+  line-height: 1.65;
+  min-height: 100vh;
+}
+
+/* grain */
+body::after {
+  content:'';
+  position:fixed; inset:0;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+  pointer-events:none; z-index:9999;
+}
+
+.app { max-width:800px; margin:0 auto; padding:0 24px 120px; }
+
+/* ── HEADER ── */
+header {
+  padding: 64px 0 48px;
+  border-bottom: 1px solid var(--border2);
+  margin-bottom: 0;
+  position: relative;
+}
+
+header::after {
+  content:'✦';
+  position:absolute; bottom:-10px; left:50%;
+  transform:translateX(-50%);
+  background:var(--bg); padding:0 14px;
+  color:var(--gold2); font-size:12px;
+}
+
+.logo-row { display:flex; align-items:baseline; gap:16px; margin-bottom:8px; }
+
+.logo {
+  font-family:'Cormorant Garamond', serif;
+  font-size:48px; font-weight:300;
+  letter-spacing:-1px; color:var(--text);
+  line-height:1;
+}
+
+.logo em { font-style:italic; color:var(--gold); }
+
+.pro-badge {
+  font-family:'JetBrains Mono', monospace;
+  font-size:8px; letter-spacing:3px;
+  color:var(--bg); background:var(--gold);
+  padding:3px 8px; text-transform:uppercase;
+  display:none;
+}
+
+.pro-badge.visible { display:inline; }
+
+.tagline {
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px; color:var(--text3);
+  letter-spacing:2px;
+}
+
+/* ── STATS ── */
+.stats {
+  display:flex; gap:1px;
+  background:var(--border);
+  margin: 36px 0;
+}
+
+.stat {
+  flex:1; background:var(--card);
+  padding:18px 16px; text-align:center;
+}
+
+.stat-n {
+  font-family:'Cormorant Garamond', serif;
+  font-size:32px; font-weight:300;
+  color:var(--gold); line-height:1;
+  margin-bottom:5px;
+}
+
+.stat-l {
+  font-family:'JetBrains Mono', monospace;
+  font-size:8px; color:var(--text3);
+  letter-spacing:2px; text-transform:uppercase;
+}
+
+/* ── NAV ── */
+.nav {
+  display:flex; gap:0;
+  border-bottom:1px solid var(--border2);
+  margin-bottom:36px;
+  overflow-x:auto;
+}
+
+.nav::-webkit-scrollbar { display:none; }
+
+.nav-tab {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:2px;
+  text-transform:uppercase;
+  color:var(--text3); padding:11px 18px;
+  cursor:pointer; border:none; background:none;
+  border-bottom:2px solid transparent;
+  margin-bottom:-1px; white-space:nowrap;
+  transition:all 0.2s; display:flex;
+  align-items:center; gap:7px;
+}
+
+.nav-tab:hover { color:var(--text2); }
+.nav-tab.active { color:var(--gold); border-bottom-color:var(--gold); }
+.nav-tab.locked { opacity:0.25; cursor:not-allowed; }
+.nav-tab.locked:hover { color:var(--text3); }
+
+.badge {
+  background:var(--gold2); color:var(--gold);
+  font-size:8px; padding:1px 5px;
+  border-radius:1px; min-width:14px; text-align:center;
+}
+
+.pro-lock {
+  font-size:9px; color:var(--gold2);
+}
+
+/* ── PANELS ── */
+.panel { display:none; }
+.panel.active { display:block; animation:fadeUp 0.3s ease; }
+
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(8px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* ── WRITE ── */
+.date-row {
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px; color:var(--gold);
+  letter-spacing:3px; text-transform:uppercase;
+  margin-bottom:18px;
+  display:flex; align-items:center; gap:14px;
+}
+
+.date-row::after { content:''; flex:1; height:1px; background:var(--border2); }
+
+textarea {
+  width:100%;
+  background:var(--card);
+  border:1px solid var(--border2);
+  color:var(--text);
+  font-family:'Cormorant Garamond', serif;
+  font-size:20px; font-weight:300;
+  line-height:1.75; padding:26px 28px;
+  resize:none; min-height:160px;
+  outline:none; transition:border-color 0.3s;
+  border-radius:0;
+}
+
+textarea::placeholder { color:var(--text3); font-style:italic; }
+textarea:focus { border-color:var(--gold2); }
+
+/* Photo upload area */
+.photo-area {
+  border:1px dashed var(--border2);
+  background:var(--card);
+  padding:20px;
+  margin-top:10px;
+  cursor:pointer;
+  transition:all 0.2s;
+  position:relative;
+  display:none;
+}
+
+.photo-area.pro-visible { display:block; }
+.photo-area:hover { border-color:var(--gold2); }
+
+.photo-area input[type=file] {
+  position:absolute; inset:0;
+  opacity:0; cursor:pointer; width:100%; height:100%;
+}
+
+.photo-area-label {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; color:var(--text3);
+  letter-spacing:2px; text-transform:uppercase;
+  text-align:center; display:flex;
+  align-items:center; justify-content:center; gap:10px;
+}
+
+.photo-preview {
+  display:flex; gap:10px; flex-wrap:wrap;
+  margin-top:12px;
+}
+
+.photo-thumb {
+  width:64px; height:64px;
+  object-fit:cover;
+  border:1px solid var(--border2);
+  opacity:0.8;
+}
+
+.write-footer {
+  display:flex; justify-content:space-between;
+  align-items:center; margin-top:10px;
+}
+
+.char-info {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; color:var(--text3); letter-spacing:1px;
+}
+
+.btn {
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px; letter-spacing:2px;
+  text-transform:uppercase; padding:12px 26px;
+  cursor:pointer; transition:all 0.2s; border-radius:0;
+}
+
+.btn-gold {
+  background:var(--gold); color:var(--bg);
+  border:1px solid var(--gold); font-weight:500;
+}
+
+.btn-gold:hover { background:#ccaa6a; }
+.btn-gold:disabled { opacity:0.35; cursor:not-allowed; }
+
+.btn-outline {
+  background:none; border:1px solid var(--border2);
+  color:var(--text3);
+}
+
+.btn-outline:hover { border-color:var(--text3); color:var(--text2); }
+
+/* Archivista box */
+.arch-box {
+  margin-top:24px;
+  border:1px solid var(--gold2);
+  border-left:3px solid var(--gold);
+  background:var(--card); padding:26px 30px;
+  display:none; animation:fadeUp 0.4s ease;
+  position:relative; overflow:hidden;
+}
+
+.arch-box::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0;
+  height:1px;
+  background:linear-gradient(to right, var(--gold), transparent);
+}
+
+.arch-box.visible { display:block; }
+
+.arch-label {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:3px;
+  text-transform:uppercase; color:var(--gold);
+  margin-bottom:14px;
+  display:flex; align-items:center; gap:8px;
+}
+
+.pulse { width:5px; height:5px; border-radius:50%; background:var(--gold); animation:pulse 2s infinite; }
+@keyframes pulse { 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:0.3;transform:scale(0.8);} }
+
+.arch-text {
+  font-size:20px; line-height:1.75;
+  color:var(--text); font-weight:300;
+}
+
+.arch-text em { font-style:italic; color:var(--gold); }
+.arch-text strong { font-weight:600; }
+
+.kofi-row {
+  margin-top:18px; padding-top:16px;
+  border-top:1px solid var(--border);
+  display:none; align-items:center;
+  justify-content:space-between;
+}
+
+.kofi-row.show { display:flex; }
+
+.kofi-note {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; color:var(--text3); letter-spacing:1px;
+}
+
+.kofi-link {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:2px;
+  color:var(--gold);
+  border:1px solid var(--gold2); padding:6px 14px;
+  text-decoration:none; transition:all 0.2s;
+}
+
+.kofi-link:hover { border-color:var(--gold); background:var(--gold3); }
+
+/* Loading dots */
+.ldots { display:flex; gap:5px; align-items:center; height:22px; }
+.ldots span { width:4px; height:4px; background:var(--gold); border-radius:50%; animation:ld 1.2s infinite; }
+.ldots span:nth-child(2) { animation-delay:0.2s; }
+.ldots span:nth-child(3) { animation-delay:0.4s; }
+@keyframes ld { 0%,100%{opacity:0.2;transform:translateY(0);} 50%{opacity:1;transform:translateY(-4px);} }
+
+/* entries header */
+.sec-head {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:3px;
+  text-transform:uppercase; color:var(--text3);
+  margin:36px 0 18px;
+  display:flex; align-items:center; gap:14px;
+}
+
+.sec-head::after { content:''; flex:1; height:1px; background:var(--border2); }
+
+/* entry card */
+.entry-card {
+  border:1px solid var(--border);
+  background:var(--card); padding:18px 22px;
+  margin-bottom:8px; cursor:pointer;
+  transition:all 0.2s; animation:fadeUp 0.3s ease;
+}
+
+.entry-card:hover { border-color:var(--border2); background:#131109; }
+.entry-card.open { border-color:var(--gold2); }
+
+.entry-top {
+  display:flex; justify-content:space-between;
+  align-items:flex-start; gap:14px;
+}
+
+.entry-date {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; color:var(--text3);
+  letter-spacing:2px; white-space:nowrap; flex-shrink:0;
+}
+
+.entry-prev {
+  font-size:16px; color:var(--text2);
+  font-weight:300; flex:1;
+  overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+}
+
+.entry-has-photo {
+  font-family:'JetBrains Mono', monospace;
+  font-size:8px; color:var(--gold2); letter-spacing:1px;
+}
+
+.entry-expand {
+  display:none; margin-top:14px;
+  padding-top:14px; border-top:1px solid var(--border);
+}
+
+.entry-card.open .entry-expand { display:block; }
+
+.entry-full {
+  font-size:17px; color:var(--text2);
+  line-height:1.7; font-weight:300; margin-bottom:12px;
+}
+
+.entry-photos { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px; }
+.entry-photo-thumb { width:80px; height:80px; object-fit:cover; border:1px solid var(--border2); opacity:0.75; }
+
+.entry-arch {
+  font-size:15px; font-style:italic;
+  color:var(--text3); padding-left:12px;
+  border-left:2px solid var(--gold2);
+  line-height:1.65;
+}
+
+/* ── UPGRADE SCREEN ── */
+#upgrade-screen {
+  position:fixed; inset:0;
+  background:#050504;
+  z-index:8000;
+  display:none; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:40px;
+  animation:fadeUp 0.4s ease;
+}
+
+#upgrade-screen.visible { display:flex; }
+
+.upgrade-inner { max-width:560px; width:100%; }
+
+.upgrade-eyebrow {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:4px;
+  color:var(--text3); text-transform:uppercase;
+  margin-bottom:28px;
+}
+
+.upgrade-title {
+  font-family:'Cormorant Garamond', serif;
+  font-size:42px; font-weight:300;
+  color:var(--text); line-height:1.15;
+  margin-bottom:8px;
+}
+
+.upgrade-title em { font-style:italic; color:var(--gold); }
+
+.upgrade-sub {
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px; color:var(--text3);
+  letter-spacing:1px; margin-bottom:48px;
+}
+
+.upgrade-divider {
+  height:1px;
+  background:linear-gradient(to right, var(--gold2), transparent);
+  margin-bottom:40px;
+}
+
+.upgrade-features { margin-bottom:44px; }
+
+.uf-row {
+  display:grid; grid-template-columns:1fr 1fr;
+  gap:0; margin-bottom:1px;
+}
+
+.uf-cell {
+  padding:16px 20px;
+  background:var(--card);
+  border:1px solid var(--border);
+  margin:-1px 0 0 -1px;
+}
+
+.uf-cell:first-child {
+  border-right-color:var(--border2);
+}
+
+.uf-plan {
+  font-family:'JetBrains Mono', monospace;
+  font-size:8px; letter-spacing:3px;
+  text-transform:uppercase; margin-bottom:10px;
+}
+
+.uf-plan.free { color:var(--text3); }
+.uf-plan.pro { color:var(--gold); }
+
+.uf-price {
+  font-family:'Cormorant Garamond', serif;
+  font-size:30px; font-weight:300;
+  line-height:1; margin-bottom:4px;
+}
+
+.uf-price.free { color:var(--text2); }
+.uf-price.pro { color:var(--gold); }
+
+.uf-period {
+  font-family:'JetBrains Mono', monospace;
+  font-size:8px; color:var(--text3);
+  letter-spacing:1px; margin-bottom:16px;
+}
+
+.uf-feature {
+  font-size:14px; color:var(--text2);
+  font-weight:300; line-height:1.7;
+  padding:3px 0;
+  display:flex; align-items:flex-start; gap:8px;
+}
+
+.uf-feature::before { content:'—'; color:var(--text3); flex-shrink:0; }
+.uf-feature.pro-only { color:var(--text); }
+.uf-feature.pro-only::before { content:'✦'; color:var(--gold); font-size:10px; }
+
+.upgrade-cta {
+  display:flex; flex-direction:column;
+  align-items:flex-start; gap:12px;
+}
+
+.upgrade-note {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; color:var(--text3);
+  letter-spacing:1px; line-height:1.7;
+}
+
+.upgrade-close {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:2px;
+  color:var(--text3); background:none;
+  border:none; cursor:pointer;
+  text-transform:uppercase; margin-top:4px;
+  transition:color 0.2s;
+}
+
+.upgrade-close:hover { color:var(--text2); }
+
+/* ── INSIGHT OVERLAY ── */
+#insight-overlay {
+  position:fixed; inset:0;
+  background:#040403;
+  z-index:9500;
+  display:none; flex-direction:column;
+  align-items:center; justify-content:center;
+  padding:48px;
+  opacity:0; transition:opacity 1.2s ease;
+}
+
+#insight-overlay.visible { display:flex; }
+#insight-overlay.faded { opacity:1; }
+
+.io-eyebrow {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:5px;
+  color:var(--text3); text-transform:uppercase;
+  margin-bottom:64px;
+  opacity:0; transform:translateY(6px);
+  transition:all 0.8s ease 0.6s;
+}
+
+.io-eyebrow.s { opacity:1; transform:translateY(0); }
+
+.io-dates {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:3px;
+  color:var(--gold2); text-transform:uppercase;
+  margin-bottom:28px;
+  opacity:0; transition:all 0.8s ease 1.2s;
+}
+
+.io-dates.s { opacity:1; }
+
+.io-text {
+  font-family:'Cormorant Garamond', serif;
+  font-size:clamp(20px, 3vw, 32px);
+  font-weight:300; line-height:1.7;
+  color:var(--text); text-align:center;
+  max-width:640px;
+  opacity:0; transform:translateY(14px);
+  transition:all 1.2s ease 1.6s;
+}
+
+.io-text.s { opacity:1; transform:translateY(0); }
+.io-text em { font-style:italic; color:var(--gold); }
+
+.io-line {
+  width:1px; height:0;
+  background:linear-gradient(to bottom, var(--gold2), transparent);
+  margin:44px auto;
+  transition:height 0.9s ease 3s;
+}
+
+.io-line.s { height:56px; }
+
+.io-actions {
+  display:flex; flex-direction:column;
+  align-items:center; gap:14px;
+  opacity:0; transition:all 0.8s ease 3.6s;
+}
+
+.io-actions.s { opacity:1; }
+
+.io-kofi {
+  font-family:'JetBrains Mono', monospace;
+  font-size:10px; letter-spacing:2px;
+  color:var(--gold);
+  border:1px solid var(--gold2); padding:13px 32px;
+  text-decoration:none; transition:all 0.2s;
+}
+
+.io-kofi:hover { border-color:var(--gold); background:var(--gold3); }
+
+.io-dismiss {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:2px;
+  color:var(--text3); background:none;
+  border:none; cursor:pointer;
+  text-transform:uppercase; transition:color 0.2s;
+}
+
+.io-dismiss:hover { color:var(--text2); }
+
+/* ── PROMISES ── */
+.promise-item {
+  border:1px solid var(--border2);
+  background:var(--card); padding:18px 22px;
+  margin-bottom:8px;
+  display:flex; gap:18px; align-items:flex-start;
+  position:relative; animation:fadeUp 0.3s ease;
+}
+
+.promise-item::before {
+  content:''; position:absolute;
+  left:0; top:0; bottom:0;
+  width:2px; background:var(--green);
+}
+
+.promise-age {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; color:var(--text3);
+  letter-spacing:1px; white-space:nowrap; min-width:70px;
+}
+
+.promise-age.old { color:#c06050; }
+
+.promise-body { flex:1; }
+
+.promise-text {
+  font-size:17px; color:var(--text2);
+  font-weight:300; line-height:1.6;
+  font-style:italic;
+}
+
+.promise-from {
+  font-family:'JetBrains Mono', monospace;
+  font-size:8px; color:var(--text3);
+  letter-spacing:1px; margin-top:6px;
+}
+
+.promise-btns { display:flex; gap:8px; margin-top:10px; }
+
+.pbtn {
+  font-family:'JetBrains Mono', monospace;
+  font-size:8px; letter-spacing:1px;
+  padding:4px 10px; cursor:pointer;
+  border:1px solid; background:none;
+  transition:all 0.2s;
+}
+
+.pbtn.done { border-color:var(--green); color:var(--green); }
+.pbtn.done:hover { background:var(--green); color:var(--bg); }
+.pbtn.skip { border-color:var(--red); color:#c06050; }
+.pbtn.skip:hover { background:var(--red); color:var(--text); }
+
+/* ── CONTRADICTIONS ── */
+.c-intro {
+  font-size:16px; color:var(--text2);
+  font-weight:300; font-style:italic;
+  line-height:1.7; margin-bottom:24px;
+  padding:18px 22px;
+  border-left:2px solid var(--red);
+  background:#110a0a;
+}
+
+.c-item {
+  border:1px solid var(--border2);
+  background:var(--card); padding:22px;
+  margin-bottom:10px;
+  position:relative; animation:fadeUp 0.3s ease;
+}
+
+.c-item::before {
+  content:''; position:absolute;
+  left:0; top:0; bottom:0;
+  width:2px; background:var(--red);
+}
+
+.c-dates {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; color:var(--text3);
+  letter-spacing:2px; margin-bottom:14px;
+  display:flex; gap:16px;
+}
+
+.c-pair {
+  display:grid; grid-template-columns:1fr auto 1fr;
+  gap:14px; align-items:start;
+}
+
+.c-side { font-size:16px; color:var(--text2); font-weight:300; line-height:1.6; }
+.c-side em { font-style:italic; color:var(--text); }
+.c-arr { color:var(--red); font-size:18px; }
+.c-note { margin-top:12px; font-family:'JetBrains Mono', monospace; font-size:9px; color:var(--text3); letter-spacing:1px; }
+
+/* ── VERSIONS ── */
+.v-item {
+  border:1px solid var(--border2);
+  background:var(--card); padding:26px;
+  margin-bottom:12px;
+  position:relative; animation:fadeUp 0.3s ease;
+}
+
+.v-item::before {
+  content:''; position:absolute;
+  left:0; top:0; bottom:0;
+  width:2px; background:var(--blue);
+}
+
+.v-period {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; color:var(--text3);
+  letter-spacing:3px; text-transform:uppercase;
+  margin-bottom:10px;
+}
+
+.v-name {
+  font-family:'Cormorant Garamond', serif;
+  font-size:26px; font-weight:300;
+  font-style:italic; color:var(--text);
+  margin-bottom:10px;
+}
+
+.v-desc { font-size:16px; color:var(--text2); font-weight:300; line-height:1.7; }
+
+.v-themes { display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; }
+
+.v-tag {
+  font-family:'JetBrains Mono', monospace;
+  font-size:8px; padding:3px 9px;
+  border:1px solid var(--blue); color:#5a8ab0;
+  letter-spacing:1px;
+}
+
+/* ── INTERROGATORIO ── */
+.interro-wrap {
+  border:1px solid var(--gold2);
+  background:var(--card); padding:36px;
+  position:relative; overflow:hidden;
+}
+
+.interro-wrap::before {
+  content:'';
+  position:absolute; top:0; left:0; right:0;
+  height:2px;
+  background:linear-gradient(to right, var(--gold), var(--gold2), transparent);
+}
+
+.interro-head {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:3px;
+  color:var(--gold); text-transform:uppercase;
+  margin-bottom:28px;
+  display:flex; align-items:center; gap:8px;
+}
+
+.q-block { margin-bottom:26px; padding-bottom:26px; border-bottom:1px solid var(--border); }
+.q-block:last-of-type { border-bottom:none; }
+
+.q-num {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; color:var(--text3);
+  letter-spacing:2px; margin-bottom:8px;
+}
+
+.q-text { font-size:21px; font-weight:300; color:var(--text); line-height:1.6; margin-bottom:14px; }
+
+.q-ans {
+  width:100%;
+  background:#090807;
+  border:1px solid var(--border2);
+  color:var(--text);
+  font-family:'Cormorant Garamond', serif;
+  font-size:18px; font-weight:300;
+  padding:14px 18px; resize:none;
+  min-height:72px; outline:none;
+  transition:border-color 0.2s;
+}
+
+.q-ans:focus { border-color:var(--gold2); }
+
+.interro-footer {
+  margin-top:22px;
+  display:flex; justify-content:space-between; align-items:center;
+}
+
+.interro-note {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; color:var(--text3); letter-spacing:1px;
+}
+
+/* ── LOCKED STATE ── */
+.locked-panel {
+  text-align:center; padding:70px 30px;
+  border:1px dashed var(--border2);
+}
+
+.locked-icon { font-size:28px; color:var(--text3); margin-bottom:18px; }
+
+.locked-title {
+  font-family:'Cormorant Garamond', serif;
+  font-size:22px; font-weight:300;
+  font-style:italic; color:var(--text2);
+  margin-bottom:8px;
+}
+
+.locked-desc {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; color:var(--text3);
+  letter-spacing:1px; line-height:1.9;
+}
+
+.locked-bar-wrap {
+  max-width:180px; margin:20px auto 0;
+  background:var(--border); height:2px; border-radius:1px; overflow:hidden;
+}
+
+.locked-bar { height:100%; background:var(--gold2); transition:width 0.5s ease; }
+
+/* ── EMPTY ── */
+.empty {
+  text-align:center; padding:50px 20px;
+  border:1px dashed var(--border2);
+  color:var(--text3); font-size:16px; font-style:italic;
+}
+
+/* ── PROMISE MODAL ── */
+#promise-modal {
+  position:fixed; inset:0;
+  background:#000000cc; z-index:8500;
+  display:none; align-items:center; justify-content:center;
+}
+
+.promise-modal-inner {
+  background:var(--card);
+  border:1px solid var(--gold2);
+  border-top:2px solid var(--gold);
+  max-width:500px; width:90%; padding:34px;
+}
+
+.pm-head {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:3px;
+  color:var(--gold); text-transform:uppercase;
+  margin-bottom:18px;
+}
+
+.pm-list { margin-bottom:22px; }
+
+.pm-item {
+  padding:12px 0; border-bottom:1px solid var(--border);
+  font-size:17px; color:var(--text2);
+  font-style:italic; font-weight:300;
+}
+
+.pm-item:last-child { border-bottom:none; }
+
+.pm-footer { display:flex; gap:10px; justify-content:flex-end; }
+
+/* ── FOOTER ── */
+.site-footer {
+  position:fixed; bottom:0; left:0; right:0;
+  background:var(--bg);
+  border-top:1px solid var(--border);
+  padding:9px 28px;
+  display:flex; align-items:center; justify-content:space-between;
+  z-index:100;
+}
+
+.footer-note {
+  font-family:'JetBrains Mono', monospace;
+  font-size:8px; color:var(--text3); letter-spacing:1px;
+}
+
+.footer-btns { display:flex; gap:16px; align-items:center; }
+
+.footer-btn {
+  font-family:'JetBrains Mono', monospace;
+  font-size:8px; letter-spacing:1px;
+  background:none; border:none; cursor:pointer;
+  padding:3px 0; transition:color 0.2s;
+}
+
+.footer-btn.upgrade { color:var(--gold); border-bottom:1px solid var(--gold2); }
+.footer-btn.upgrade:hover { border-bottom-color:var(--gold); }
+.footer-btn.danger { color:var(--text3); }
+.footer-btn.danger:hover { color:#c06050; }
+
+/* ── TOAST ── */
+.toast {
+  position:fixed; bottom:48px; right:28px;
+  background:var(--card);
+  border:1px solid var(--gold2);
+  border-left:3px solid var(--gold);
+  padding:12px 18px;
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; color:var(--gold); letter-spacing:1px;
+  animation:fadeUp 0.3s ease; z-index:9998;
+  max-width:280px;
+}
+
+@keyframes toastOut { to { opacity:0; transform:translateY(8px); } }
+
+/* Demo button */
+.demo-btn {
+  text-align:center; margin-top:24px;
+}
+
+.demo-btn button {
+  font-family:'JetBrains Mono', monospace;
+  font-size:9px; letter-spacing:2px;
+  color:var(--text3); background:none;
+  border:1px dashed var(--border2);
+  padding:7px 18px; cursor:pointer;
+  transition:all 0.2s;
+}
+
+.demo-btn button:hover { color:var(--gold); border-color:var(--gold2); }
+</style>
+</head>
+<body>
+
+<div class="app">
+
+  <!-- HEADER -->
+  <header>
+    <div class="logo-row">
+      <div class="logo">El <em>Archivo</em></div>
+      <span class="pro-badge" id="pro-badge">Pro</span>
+    </div>
+    <div class="tagline">Lo que dijiste. Lo que olvidaste. Lo que volviste a decir.</div>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats">
+    <div class="stat"><div class="stat-n" id="sn-e">0</div><div class="stat-l">Entradas</div></div>
+    <div class="stat"><div class="stat-n" id="sn-p">0</div><div class="stat-l">Promesas</div></div>
+    <div class="stat"><div class="stat-n" id="sn-c">0</div><div class="stat-l">Contradicciones</div></div>
+    <div class="stat"><div class="stat-n" id="sn-v">0</div><div class="stat-l">Versiones</div></div>
+  </div>
+
+  <!-- NAV -->
+  <nav class="nav">
+    <button class="nav-tab active" onclick="switchTab('write')">Escribir</button>
+    <button class="nav-tab" id="tab-historial" onclick="switchTab('historial')">Historial <span class="badge" id="badge-h">0</span></button>
+    <button class="nav-tab locked" id="tab-promises" onclick="switchTab('promises')">Promesas <span class="badge" id="badge-p">0</span></button>
+    <button class="nav-tab locked" id="tab-contradictions" onclick="switchTab('contradictions')">Contradicciones <span class="badge" id="badge-c">0</span></button>
+    <button class="nav-tab locked" id="tab-versions" onclick="switchTab('versions')">Versiones</button>
+    <button class="nav-tab locked" id="tab-interrogatorio" onclick="switchTab('interrogatorio')">Interrogatorio</button>
+  </nav>
+
+  <!-- WRITE -->
+  <div class="panel active" id="panel-write">
+    <div class="date-row" id="date-label">—</div>
+
+    <textarea id="entry-input" placeholder="Escribí lo que sea. El archivo no olvida nada." maxlength="3000"></textarea>
+
+    <!-- Photo upload (Pro only) -->
+    <div class="photo-area" id="photo-area">
+      <input type="file" id="photo-input" accept="image/*" multiple onchange="handlePhotos(this)">
+      <div class="photo-area-label">
+        <span>✦</span>
+        <span>Adjuntar fotos — el archivo las cruza con tus entradas</span>
+      </div>
+      <div class="photo-preview" id="photo-preview"></div>
+    </div>
+
+    <div class="write-footer">
+      <span class="char-info"><span id="char-count">0</span> / 3000</span>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <button class="btn btn-outline" id="photo-trigger-btn" onclick="triggerPhotoUpgrade()" style="font-size:9px;padding:10px 16px;">📷 Foto</button>
+        <button class="btn btn-gold" id="save-btn" onclick="saveEntry()">Archivar → Ctrl+Enter</button>
+      </div>
+    </div>
+
+    <div class="arch-box" id="arch-box">
+      <div class="arch-label"><span class="pulse"></span>El Archivista</div>
+      <div class="arch-text" id="arch-text"><div class="ldots"><span></span><span></span><span></span></div></div>
+      <div class="kofi-row" id="kofi-row">
+        <span class="kofi-note">Si esto resonó</span>
+        <a href="https://ko-fi.com/nineplus" target="_blank" class="kofi-link">☕ $5 →</a>
+      </div>
+    </div>
+
+    <div class="sec-head">Entradas recientes</div>
+    <div id="recent-entries"></div>
+
+    <div class="demo-btn">
+      <button onclick="generateInsight(true)">Ver demo del insight especial →</button>
+    </div>
+  </div>
+
+  <!-- HISTORIAL -->
+  <div class="panel" id="panel-historial">
+    <div class="sec-head">Todas las entradas</div>
+    <div id="all-entries"></div>
+  </div>
+
+  <!-- PROMISES -->
+  <div class="panel" id="panel-promises">
+    <div id="promises-content"></div>
+  </div>
+
+  <!-- CONTRADICTIONS -->
+  <div class="panel" id="panel-contradictions">
+    <div id="contradictions-content"></div>
+  </div>
+
+  <!-- VERSIONS -->
+  <div class="panel" id="panel-versions">
+    <div id="versions-content"></div>
+  </div>
+
+  <!-- INTERROGATORIO -->
+  <div class="panel" id="panel-interrogatorio">
+    <div id="interrogatorio-content"></div>
+  </div>
+
+</div>
+
+<!-- UPGRADE SCREEN -->
+<div id="upgrade-screen">
+  <div class="upgrade-inner">
+    <div class="upgrade-eyebrow">El Archivo — Planes</div>
+    <div class="upgrade-title">El archivo <em>completo</em></div>
+    <div class="upgrade-sub">Texto, fotos, patrones. Todo en el mismo lugar.</div>
+    <div class="upgrade-divider"></div>
+
+    <div class="upgrade-features">
+      <div class="uf-row">
+        <div class="uf-cell">
+          <div class="uf-plan free">Gratuito</div>
+          <div class="uf-price free">$0</div>
+          <div class="uf-period">siempre</div>
+          <div class="uf-feature">Entradas de texto ilimitadas</div>
+          <div class="uf-feature">Respuesta del archivista</div>
+          <div class="uf-feature">Promesas y contradicciones</div>
+          <div class="uf-feature">Versiones de vos</div>
+          <div class="uf-feature">Interrogatorio semanal</div>
+        </div>
+        <div class="uf-cell">
+          <div class="uf-plan pro">Pro</div>
+          <div class="uf-price pro">$5</div>
+          <div class="uf-period">por mes · vía Ko-fi</div>
+          <div class="uf-feature">Todo lo anterior</div>
+          <div class="uf-feature pro-only">Fotos adjuntas a entradas</div>
+          <div class="uf-feature pro-only">El archivo cruza fotos con texto</div>
+          <div class="uf-feature pro-only">Síntesis visual cada 3 días</div>
+          <div class="uf-feature pro-only">Análisis de patrones visuales</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="upgrade-cta">
+      <a href="https://ko-fi.com/nineplus/tiers" target="_blank" class="btn btn-gold" style="text-decoration:none;font-size:10px;">Suscribirse por $5/mes →</a>
+      <div class="upgrade-note">
+        Pago vía Ko-fi · Tarjeta de crédito o débito desde cualquier país<br>
+        Después de suscribirte, activá Pro con el código que recibís por email.
+      </div>
+      <button class="upgrade-close" onclick="closeUpgrade()">Quedarme en la versión gratuita</button>
+    </div>
+  </div>
+</div>
+
+<!-- INSIGHT OVERLAY -->
+<div id="insight-overlay">
+  <div class="io-eyebrow" id="io-ey">El Archivo — Síntesis</div>
+  <div class="io-dates" id="io-dates"></div>
+  <div class="io-text" id="io-text"></div>
+  <div class="io-line" id="io-line"></div>
+  <div class="io-actions" id="io-actions">
+    <a href="https://ko-fi.com/nineplus" target="_blank" class="io-kofi">☕ Esto valió $5 →</a>
+    <button class="io-dismiss" onclick="dismissInsight()">Cerrar y continuar</button>
+  </div>
+</div>
+
+<!-- PROMISE MODAL -->
+<div id="promise-modal">
+  <div class="promise-modal-inner">
+    <div class="pm-head">Compromisos detectados</div>
+    <div class="pm-list" id="pm-list"></div>
+    <div class="pm-footer">
+      <button class="btn btn-outline" onclick="dismissPromises()">No archivar</button>
+      <button class="btn btn-gold" onclick="confirmPromises()">Archivar</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="site-footer">
+  <span class="footer-note">Texto procesado en servidores Anthropic · Datos locales en este navegador</span>
+  <div class="footer-btns">
+    <button class="footer-btn upgrade" onclick="showUpgrade()">✦ Activar Pro</button>
+    <button class="footer-btn danger" onclick="confirmDeleteAll()">Borrar archivo</button>
+  </div>
+</footer>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────
+const SK = 'archivo_final_v1';
+let state = JSON.parse(localStorage.getItem(SK) || 'null') || {
+  entries: [], promises: [], pendingPromises: [],
+  contradictions: [], versions: [],
+  lastInterrogatorio: null, lastInsight: null,
+  interrogatorioAnswers: [], firstUsed: Date.now(),
+  isPro: false
+};
+
+if (!state.pendingPromises) state.pendingPromises = [];
+
+function save() { localStorage.setItem(SK, JSON.stringify(state)); }
+
+// ── INIT ───────────────────────────────────────────────────────
+const today = new Date();
+const dateStr = today.toLocaleDateString('es-AR', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+const dateShort = today.toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' });
+document.getElementById('date-label').textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+
+const input = document.getElementById('entry-input');
+input.addEventListener('input', () => document.getElementById('char-count').textContent = input.value.length);
+input.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') saveEntry(); });
+
+// ── PRO STATE ─────────────────────────────────────────────────
+function applyProState() {
+  if (state.isPro) {
+    document.getElementById('pro-badge').classList.add('visible');
+    document.getElementById('photo-area').classList.add('pro-visible');
+    document.getElementById('photo-trigger-btn').style.display = 'none';
+  }
+}
+
+// ── TABS ──────────────────────────────────────────────────────
+function switchTab(name) {
+  const t = document.getElementById('tab-' + name);
+  if (t && t.classList.contains('locked')) return;
+  document.querySelectorAll('.nav-tab').forEach(x => x.classList.remove('active'));
+  document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
+  const activeTab = document.querySelector(`.nav-tab[onclick="switchTab('${name}')"]`);
+  if (activeTab) activeTab.classList.add('active');
+  document.getElementById('panel-' + name).classList.add('active');
+  if (name === 'promises') renderPromises();
+  if (name === 'contradictions') renderContradictions();
+  if (name === 'versions') renderVersions();
+  if (name === 'interrogatorio') renderInterrogatorio();
+  if (name === 'historial') renderAllEntries();
+}
+
+function unlockTabs() {
+  const n = state.entries.length;
+  document.getElementById('tab-historial').classList.remove('locked');
+  if (n >= 2 || state.promises.length > 0) document.getElementById('tab-promises').classList.remove('locked');
+  if (n >= 3 || state.contradictions.length > 0) document.getElementById('tab-contradictions').classList.remove('locked');
+  if (n >= 5 || state.versions.length > 0) document.getElementById('tab-versions').classList.remove('locked');
+  if (n >= 3) document.getElementById('tab-interrogatorio').classList.remove('locked');
+
+  document.getElementById('badge-h').textContent = state.entries.length;
+  const op = state.promises.filter(p => p.status === 'open');
+  document.getElementById('badge-p').textContent = op.length;
+  document.getElementById('badge-c').textContent = state.contradictions.length;
+
+  document.getElementById('sn-e').textContent = state.entries.length;
+  document.getElementById('sn-p').textContent = op.length;
+  document.getElementById('sn-c').textContent = state.contradictions.length;
+  document.getElementById('sn-v').textContent = state.versions.length;
+}
+
+// ── PHOTOS ────────────────────────────────────────────────────
+let pendingPhotos = [];
+let pendingPhotoData = [];
+
+function triggerPhotoUpgrade() {
+  showUpgrade();
+}
+
+function handlePhotos(input) {
+  const files = Array.from(input.files);
+  const preview = document.getElementById('photo-preview');
+  preview.innerHTML = '';
+  pendingPhotos = [];
+  pendingPhotoData = [];
+
+  files.slice(0, 4).forEach(file => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = document.createElement('img');
+      img.src = e.target.result;
+      img.className = 'photo-thumb';
+      preview.appendChild(img);
+      pendingPhotos.push(e.target.result);
+
+      // Store base64 for API
+      const base64 = e.target.result.split(',')[1];
+      const mediaType = file.type;
+      pendingPhotoData.push({ base64, mediaType });
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── SAVE ENTRY ────────────────────────────────────────────────
+async function saveEntry() {
+  const text = input.value.trim();
+  if (!text) return;
+
+  const btn = document.getElementById('save-btn');
+  btn.disabled = true;
+  btn.textContent = 'Archivando...';
+
+  const archBox = document.getElementById('arch-box');
+  const archText = document.getElementById('arch-text');
+  archBox.classList.add('visible');
+  archText.innerHTML = '<div class="ldots"><span></span><span></span><span></span></div>';
+  document.getElementById('kofi-row').classList.remove('show');
+
+  const historyCtx = state.entries.slice(-20).map(e => `[${e.dateShort}]: "${e.text}"`).join('\n') || 'Sin historial previo.';
+  const n = state.entries.length;
+
+  const escalation = n <= 2
+    ? 'PROFUNDIDAD: Baja. Pocas entradas. Observá sin presionar. Pregunta final suave.'
+    : n <= 6
+    ? 'PROFUNDIDAD: Media. Patrones emergiendo. Si algo se repite, señalalo con más peso.'
+    : 'PROFUNDIDAD: Alta. Historial suficiente. La pregunta final aprieta exactamente donde corresponde.';
+
+  const hasPhotos = pendingPhotoData.length > 0;
+
+  const prompt = `Sos el Archivista. Registrás y cruzás entradas de un diario personal.
+
+TONO: Notarial. Sereno. No sos terapeuta ni coach. Registrás hechos y los cruzás. Nunca usás: "noto que", "parece que", "es interesante", "quizás", "tal vez". No nombrás vicios. Solo cruzás y preguntás.
+
+${escalation}
+
+OPERATIVOS INTERNOS (nunca los mencionás):
+- Rorty: el vocabulario que alguien repite lo está construyendo. Lo rastreás en silencio.
+- Shklar: los patrones pequeños son más reveladores que los grandes. Los yuxtaponés, nunca los nombrás.
+
+${hasPhotos ? 'NOTA: El usuario adjuntó fotos a esta entrada. Analizalas en contexto con el texto y el historial. ¿Qué dice la foto sobre lo que escribe?' : ''}
+
+HISTORIAL (${n} entradas):
+${historyCtx}
+
+NUEVA ENTRADA [${dateShort}]:
+"${text}"
+
+Devolvé SOLO este JSON, sin texto extra, sin backticks:
+{
+  "internal_themes": ["3-5 temas internos, nunca visibles"],
+  "archivista": "2-3 oraciones notariales. Si hay historial: citá fecha y hecho concreto. Cerrá con UNA pregunta directa. Máx 65 palabras.${hasPhotos ? ' Si hay fotos: integralas al análisis como parte de la narrativa.' : ''}",
+  "promises": ["promesas reales detectadas. Máx 3. Array vacío si no hay."],
+  "contradiction": {
+    "found": true o false,
+    "entry1_date": "fecha exacta",
+    "entry1_text": "fragmento mínimo",
+    "entry2_text": "fragmento mínimo de hoy",
+    "note": "una oración sin juicio"
+  }
+}`;
+
+  try {
+    // Build message content
+    const msgContent = [];
+
+    // Add photos if present
+    if (hasPhotos && state.isPro) {
+      pendingPhotoData.forEach(p => {
+        msgContent.push({ type: 'image', source: { type: 'base64', media_type: p.mediaType, data: p.base64 } });
+      });
+    }
+
+    msgContent.push({ type: 'text', text: prompt });
+
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1000,
+        messages: [{ role: "user", content: msgContent }]
+      })
+    });
+
+    const data = await res.json();
+    const raw = data.content.map(i => i.text || "").join("");
+
+    let parsed;
+    try { parsed = JSON.parse(raw.replace(/```json|```/g, "").trim()); }
+    catch { parsed = { internal_themes: [], archivista: raw.slice(0, 400), promises: [], contradiction: { found: false } }; }
+
+    const entry = {
+      id: Date.now(), date: dateStr, dateShort, text,
+      internal_themes: parsed.internal_themes || [],
+      archivista: parsed.archivista || "",
+      photos: pendingPhotos.slice()
+    };
+
+    state.entries.push(entry);
+
+    // Pending promises
+    const detected = (parsed.promises || []).filter(p => p && p.length > 3);
+    if (detected.length > 0) {
+      state.pendingPromises = detected.map(p => ({
+        id: Date.now() + Math.random(), text: p,
+        date: dateShort, entryId: entry.id,
+        status: 'open', createdAt: today.getTime()
+      }));
+    }
+
+    // Contradiction
+    if (parsed.contradiction && parsed.contradiction.found) {
+      state.contradictions.push({
+        id: Date.now() + 1,
+        date1: parsed.contradiction.entry1_date,
+        text1: parsed.contradiction.entry1_text,
+        date2: dateShort,
+        text2: parsed.contradiction.entry2_text,
+        note: parsed.contradiction.note
+      });
+      setTimeout(() => showToast("Contradicción registrada"), 1500);
+    }
+
+    if (state.entries.length % 5 === 0 && state.entries.length >= 5) analyzeVersions();
+
+    save();
+    unlockTabs();
+    renderRecentEntries();
+
+    archText.innerHTML = formatText(parsed.archivista || "");
+
+    if (state.entries.length > 1) {
+      document.getElementById('kofi-row').classList.add('show');
+    }
+
+    input.value = "";
+    document.getElementById('char-count').textContent = "0";
+    document.getElementById('photo-preview').innerHTML = "";
+    pendingPhotos = [];
+    pendingPhotoData = [];
+
+    if (detected.length > 0) showPromiseModal(detected);
+
+  } catch(err) {
+    archText.innerHTML = `<em>Error al conectar. Intentá de nuevo.</em>`;
+  }
+
+  btn.disabled = false;
+  btn.textContent = 'Archivar → Ctrl+Enter';
+}
+
+function formatText(t) {
+  return t
+    .replace(/["«»""]/g, m => `<em>${m}</em>`)
+    .replace(/\b(\d{1,2}\/\d{1,2}\/\d{2,4})\b/g, '<strong>$1</strong>');
+}
+
+// ── RENDER ENTRIES ────────────────────────────────────────────
+function entryHTML(e) {
+  const photos = (e.photos || []).slice(0, 4);
+  return `
+    <div class="entry-card" onclick="this.classList.toggle('open')">
+      <div class="entry-top">
+        <span class="entry-date">${e.dateShort}</span>
+        <span class="entry-prev">${e.text.slice(0, 85)}${e.text.length > 85 ? '...' : ''}</span>
+        ${photos.length > 0 ? `<span class="entry-has-photo">📷 ${photos.length}</span>` : ''}
+      </div>
+      <div class="entry-expand">
+        <div class="entry-full">${e.text}</div>
+        ${photos.length > 0 ? `<div class="entry-photos">${photos.map(p => `<img src="${p}" class="entry-photo-thumb">`).join('')}</div>` : ''}
+        ${e.archivista ? `<div class="entry-arch">${e.archivista}</div>` : ''}
+      </div>
+    </div>`;
+}
+
+function renderRecentEntries() {
+  const c = document.getElementById('recent-entries');
+  const r = [...state.entries].reverse().slice(0, 5);
+  c.innerHTML = r.length ? r.map(entryHTML).join('') : '<div class="empty">Todavía no hay entradas.</div>';
+}
+
+function renderAllEntries() {
+  const c = document.getElementById('all-entries');
+  const all = [...state.entries].reverse();
+  c.innerHTML = all.length ? all.map(entryHTML).join('') : '<div class="empty">Sin entradas.</div>';
+}
+
+// ── PROMISES ──────────────────────────────────────────────────
+function showPromiseModal(promises) {
+  const list = document.getElementById('pm-list');
+  list.innerHTML = promises.map(p => `<div class="pm-item">"${p}"</div>`).join('');
+  document.getElementById('promise-modal').style.display = 'flex';
+}
+
+function confirmPromises() {
+  (state.pendingPromises || []).forEach(p => state.promises.push(p));
+  state.pendingPromises = [];
+  save(); unlockTabs();
+  document.getElementById('promise-modal').style.display = 'none';
+  showToast(`Compromisos archivados`);
+}
+
+function dismissPromises() {
+  state.pendingPromises = [];
+  save();
+  document.getElementById('promise-modal').style.display = 'none';
+}
+
+function renderPromises() {
+  const c = document.getElementById('promises-content');
+  const open = state.promises.filter(p => p.status === 'open');
+  const closed = state.promises.filter(p => p.status !== 'open');
+
+  if (state.entries.length < 2 && open.length === 0) {
+    c.innerHTML = lockedHTML("Promesas", "El archivo necesita más entradas para detectar compromisos.", state.entries.length, 2);
+    return;
+  }
+
+  let html = '';
+  if (open.length > 0) {
+    html += `<div class="sec-head">Sin resolver (${open.length})</div>`;
+    html += open.map(p => {
+      const days = Math.floor((Date.now() - p.createdAt) / 86400000);
+      return `<div class="promise-item">
+        <div class="promise-age ${days > 14 ? 'old' : ''}">${days === 0 ? 'hoy' : `hace ${days}d`}</div>
+        <div class="promise-body">
+          <div class="promise-text">"${p.text}"</div>
+          <div class="promise-from">Detectado el ${p.date}</div>
+          <div class="promise-btns">
+            <button class="pbtn done" onclick="resolvePromise('${p.id}','done')">Lo hice</button>
+            <button class="pbtn skip" onclick="resolvePromise('${p.id}','ignored')">Lo ignoré</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+  if (closed.length > 0) {
+    html += `<div class="sec-head" style="margin-top:28px">Cerradas (${closed.length})</div>`;
+    html += closed.map(p => `<div class="promise-item" style="opacity:0.4">
+      <div class="promise-age">${p.status}</div>
+      <div class="promise-body"><div class="promise-text">"${p.text}"</div></div>
+    </div>`).join('');
+  }
+  if (!html) html = '<div class="empty">No se detectaron promesas todavía.</div>';
+  c.innerHTML = html;
+}
+
+function resolvePromise(id, status) {
+  const p = state.promises.find(p => String(p.id) === String(id));
+  if (p) { p.status = status; save(); renderPromises(); unlockTabs(); }
+}
+
+// ── CONTRADICTIONS ────────────────────────────────────────────
+function renderContradictions() {
+  const c = document.getElementById('contradictions-content');
+  if (state.entries.length < 3 && state.contradictions.length === 0) {
+    c.innerHTML = lockedHTML("Contradicciones", "El archivo necesita más entradas para detectar patrones opuestos.", state.entries.length, 3);
+    return;
+  }
+  if (state.contradictions.length === 0) {
+    c.innerHTML = '<div class="empty">Sin contradicciones registradas todavía.</div>';
+    return;
+  }
+  c.innerHTML = `<div class="c-intro">El archivo registra cuando dos entradas se contradicen. Sin juicio. Solo el registro.</div>` +
+    state.contradictions.map(x => `
+      <div class="c-item">
+        <div class="c-dates"><span>${x.date1 || '—'}</span><span>↔</span><span>${x.date2}</span></div>
+        <div class="c-pair">
+          <div class="c-side"><em>"${x.text1}"</em></div>
+          <div class="c-arr">⇄</div>
+          <div class="c-side"><em>"${x.text2}"</em></div>
+        </div>
+        ${x.note ? `<div class="c-note">— ${x.note}</div>` : ''}
+      </div>`).join('');
+}
+
+// ── VERSIONS ──────────────────────────────────────────────────
+async function analyzeVersions() {
+  const ctx = state.entries.map(e => `[${e.dateShort}]: "${e.text.slice(0,200)}"`).join('\n');
+  const prompt = `Analizás un diario personal. Identificá períodos o versiones de la persona.
+
+Marco (no mencionar): Rorty — cada período se define por el vocabulario dominante, no por los eventos.
+
+ENTRADAS:
+${ctx}
+
+JSON:
+{"versions":[{"period":"rango fechas","name":"nombre en primera o tercera persona, literario sin pretensión","description":"2-3 oraciones, cotidiano y certero","themes":["frases cortas, no palabras sueltas"]}]}
+
+1 a 4 versiones. Solo JSON.`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:800, messages:[{role:"user",content:prompt}] })
+    });
+    const data = await res.json();
+    const raw = data.content.map(i=>i.text||"").join("");
+    const parsed = JSON.parse(raw.replace(/```json|```/g,"").trim());
+    if (parsed.versions) { state.versions = parsed.versions; save(); unlockTabs(); }
+  } catch(e) {}
+}
+
+function renderVersions() {
+  const c = document.getElementById('versions-content');
+  if (state.entries.length < 5 && state.versions.length === 0) {
+    c.innerHTML = lockedHTML("Versiones", "El archivo necesita al menos 5 entradas para identificar períodos.", state.entries.length, 5);
+    return;
+  }
+  if (state.versions.length === 0) {
+    c.innerHTML = '<div class="empty" style="font-style:italic">Guardá una nueva entrada para activar el análisis de versiones.</div>';
+    return;
+  }
+  c.innerHTML = state.versions.map(v => `
+    <div class="v-item">
+      <div class="v-period">${v.period}</div>
+      <div class="v-name">${v.name}</div>
+      <div class="v-desc">${v.description}</div>
+      <div class="v-themes">${(v.themes||[]).map(t=>`<span class="v-tag">${t}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+// ── INTERROGATORIO ────────────────────────────────────────────
+async function generateInterrogatorio() {
+  const c = document.getElementById('interrogatorio-content');
+  c.innerHTML = `<div class="interro-wrap"><div class="interro-head"><span class="pulse"></span>Preparando interrogatorio...</div><div class="ldots"><span></span><span></span><span></span></div></div>`;
+
+  const ctx = state.entries.slice(-15).map(e=>`[${e.dateShort}]: "${e.text}"`).join('\n');
+  const prompt = `Sos el Archivista. Generás 3 preguntas para un interrogatorio semanal.
+
+Buscás (sin mencionarlo):
+- Rorty: ¿hay vocabulario que ya es una trampa? ¿palabras que usa para no ver algo?
+- Shklar: ¿qué patrón se vuelve hábito? No lo nombrás. Solo preguntás. El usuario llega solo.
+
+Las preguntas: encadenadas, la primera abre, la segunda presiona, la tercera va al fondo.
+Lenguaje cotidiano. Sin diagnósticos.
+
+HISTORIAL:
+${ctx}
+
+JSON: {"preguntas":[{"num":1,"texto":"..."},{"num":2,"texto":"..."},{"num":3,"texto":"..."}]}
+Solo JSON.`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:600, messages:[{role:"user",content:prompt}] })
+    });
+    const data = await res.json();
+    const raw = data.content.map(i=>i.text||"").join("");
+    const parsed = JSON.parse(raw.replace(/```json|```/g,"").trim());
+    state.currentInterrogatorio = parsed.preguntas;
+    state.lastInterrogatorio = Date.now();
+    save();
+    renderInterrogatorioForm(parsed.preguntas);
+  } catch(e) {
+    document.getElementById('interrogatorio-content').innerHTML = '<div class="empty">Error al generar.</div>';
+  }
+}
+
+function renderInterrogatorio() {
+  const c = document.getElementById('interrogatorio-content');
+  if (state.entries.length < 3) {
+    c.innerHTML = lockedHTML("Interrogatorio", "Necesitás al menos 3 entradas.", state.entries.length, 3);
+    return;
+  }
+  const week = 7*24*60*60*1000;
+  const canGen = !state.lastInterrogatorio || (Date.now()-state.lastInterrogatorio > week);
+  if (!state.currentInterrogatorio || canGen) {
+    c.innerHTML = `<div class="interro-wrap">
+      <div class="interro-head"><span class="pulse"></span>Interrogatorio semanal</div>
+      <div style="font-size:19px;color:var(--text2);line-height:1.75;margin-bottom:24px;font-style:italic;font-weight:300;">El archivo tiene preguntas. No son cómodas.</div>
+      <button class="btn btn-gold" onclick="generateInterrogatorio()">Comenzar</button>
+    </div>`;
+    return;
+  }
+  renderInterrogatorioForm(state.currentInterrogatorio);
+}
+
+function renderInterrogatorioForm(preguntas) {
+  const c = document.getElementById('interrogatorio-content');
+  if (!preguntas) return;
+  const qs = preguntas.map(p=>`
+    <div class="q-block">
+      <div class="q-num">PREGUNTA ${p.num} / 3</div>
+      <div class="q-text">${p.texto}</div>
+      <textarea class="q-ans" id="qa-${p.num}" placeholder="Respondé con honestidad." rows="3"></textarea>
+    </div>`).join('');
+  c.innerHTML = `<div class="interro-wrap">
+    <div class="interro-head"><span class="pulse"></span>Interrogatorio — ${dateShort}</div>
+    ${qs}
+    <div class="interro-footer">
+      <span class="interro-note">Respuestas guardadas localmente.</span>
+      <button class="btn btn-gold" onclick="saveInterrogatorio()">Archivar respuestas</button>
+    </div>
+  </div>`;
+}
+
+function saveInterrogatorio() {
+  const answers = [1,2,3].map(i => ({ pregunta:i, respuesta: (document.getElementById(`qa-${i}`)?.value||'') }));
+  state.interrogatorioAnswers.push({ date:dateShort, answers });
+  state.currentInterrogatorio = null;
+  save();
+  showToast("Interrogatorio archivado");
+  setTimeout(()=>switchTab('write'), 1000);
+}
+
+// ── INSIGHT OVERLAY ───────────────────────────────────────────
+async function generateInsight(demo=false) {
+  const overlay = document.getElementById('insight-overlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(()=>{ overlay.classList.add('visible'); setTimeout(()=>overlay.classList.add('faded'),50); });
+
+  const entries = demo ? [
+    {dateShort:'12/01/2026', text:'Hoy decidí que necesito más tiempo para mí. Estoy cansado de estar disponible para todos.'},
+    {dateShort:'18/01/2026', text:'Llamé a tres personas hoy que no llamaba hace meses. Me sentí bien haciendo eso.'},
+    {dateShort:'25/01/2026', text:'Otra vez cancelé planes. Dije que estaba ocupado pero en realidad no quería salir.'},
+    {dateShort:'03/02/2026', text:'Me siento solo últimamente. No entiendo por qué la gente no aparece cuando la necesitás.'},
+    {dateShort:'14/02/2026', text:'Rechacé dos invitaciones esta semana. Necesito mi espacio, eso no tiene nada de malo.'}
+  ] : state.entries.slice(-10);
+
+  const first = entries[0]?.dateShort || '';
+  const last = entries[entries.length-1]?.dateShort || '';
+
+  setTimeout(()=>{
+    document.getElementById('io-ey').classList.add('s');
+    document.getElementById('io-dates').textContent = `${first} — ${last}`;
+    document.getElementById('io-dates').classList.add('s');
+  }, 200);
+
+  const ctx = entries.map(e=>`[${e.dateShort}]: "${e.text}"`).join('\n');
+  const prompt = `Sos el Archivista. Generás una síntesis especial que cruza varias entradas y revela algo que solo se ve con distancia.
+
+Reglas:
+- Cruzá al menos 3 entradas
+- Revelar un patrón invisible de cerca
+- Tono notarial, sin moralizar, sin nombrar vicios
+- Usá <em> para las palabras que más pesan
+- Máximo 42 palabras. Que cada una cuente.
+- Una sola idea. No dos.
+
+ENTRADAS:
+${ctx}
+
+Devolvé SOLO el texto de la síntesis, sin JSON, sin comillas, sin explicación.`;
+
+  try {
+    const res = await fetch("https://api.anthropic.com/v1/messages", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({ model:"claude-sonnet-4-20250514", max_tokens:200, messages:[{role:"user",content:prompt}] })
+    });
+    const data = await res.json();
+    const text = data.content.map(i=>i.text||"").join("").trim();
+    document.getElementById('io-text').innerHTML = text;
+    setTimeout(()=>{
+      document.getElementById('io-text').classList.add('s');
+      document.getElementById('io-line').classList.add('s');
+      setTimeout(()=>document.getElementById('io-actions').classList.add('s'), 700);
+    }, 300);
+    if (!demo) { state.lastInsight = Date.now(); save(); }
+  } catch(e) {
+    document.getElementById('io-text').innerHTML = '<em>Error al generar la síntesis.</em>';
+    document.getElementById('io-text').classList.add('s');
+  }
+}
+
+function dismissInsight() {
+  const o = document.getElementById('insight-overlay');
+  o.classList.remove('faded');
+  setTimeout(()=>{ o.classList.remove('visible'); o.style.display='none'; }, 1000);
+  // Reset animation classes for next time
+  ['io-ey','io-dates','io-text','io-line','io-actions'].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el) { el.classList.remove('s'); if(id==='io-line') el.style.height='0'; }
+  });
+}
+
+function checkInsightSchedule() {
+  if (state.entries.length < 3) return;
+  const threeDays = 3*24*60*60*1000;
+  if (!state.lastInsight || (Date.now()-state.lastInsight > threeDays)) generateInsight(false);
+}
+
+// ── UPGRADE ───────────────────────────────────────────────────
+function showUpgrade() { document.getElementById('upgrade-screen').classList.add('visible'); }
+function closeUpgrade() { document.getElementById('upgrade-screen').classList.remove('visible'); }
+
+// Activation code (simple — in production this would be server-side)
+function activatePro(code) {
+  // Ko-fi sends a webhook or confirmation email — for MVP, user enters code manually
+  if (code && code.length > 4) {
+    state.isPro = true; save(); applyProState();
+    closeUpgrade();
+    showToast("Pro activado ✦");
+    document.getElementById('footer-upgrade-btn') && (document.getElementById('footer-upgrade-btn').textContent = '✦ Pro activo');
+  }
+}
+
+// ── DELETE ALL ────────────────────────────────────────────────
+function confirmDeleteAll() {
+  if (!window.confirm('Esto borra todo el archivo local. No se puede deshacer.')) return;
+  state = { entries:[], promises:[], pendingPromises:[], contradictions:[], versions:[],
+    lastInterrogatorio:null, lastInsight:null, interrogatorioAnswers:[], firstUsed:Date.now(), isPro:state.isPro };
+  save(); unlockTabs(); renderRecentEntries();
+  document.getElementById('arch-box').classList.remove('visible');
+  switchTab('write');
+  showToast('Archivo borrado');
+}
+
+// ── LOCKED ────────────────────────────────────────────────────
+function lockedHTML(title, desc, cur, needed) {
+  const pct = Math.min(100, (cur/needed)*100);
+  return `<div class="locked-panel">
+    <div class="locked-icon">⬡</div>
+    <div class="locked-title">${title}</div>
+    <div class="locked-desc">${desc}<br><br>${cur} / ${needed} entradas</div>
+    <div class="locked-bar-wrap"><div class="locked-bar" style="width:${pct}%"></div></div>
+  </div>`;
+}
+
+// ── TOAST ─────────────────────────────────────────────────────
+function showToast(msg) {
+  const ex = document.querySelector('.toast');
+  if (ex) ex.remove();
+  const t = document.createElement('div');
+  t.className = 'toast'; t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{ t.style.animation='toastOut 0.3s ease forwards'; setTimeout(()=>t.remove(),300); }, 3000);
+}
+
+// ── BOOT ──────────────────────────────────────────────────────
+applyProState();
+unlockTabs();
+renderRecentEntries();
+checkInsightSchedule();
+</script>
+</body>
+</html>
