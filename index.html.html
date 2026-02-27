@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>El Archivo</title>
+<title>Contale a Carlitos</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -920,10 +920,10 @@ textarea:focus { border-color:var(--gold2); }
   <!-- HEADER -->
   <header>
     <div class="logo-row">
-      <div class="logo">El <em>Archivo</em></div>
+      <div class="logo">Contale a <em>Carlitos</em></div>
       <span class="pro-badge" id="pro-badge">Pro</span>
     </div>
-    <div class="tagline">Lo que dijiste. Lo que olvidaste. Lo que volviste a decir.</div>
+    <div class="tagline">Carlitos recuerda todo. Todo.</div>
   </header>
 
   <!-- STATS -->
@@ -948,7 +948,7 @@ textarea:focus { border-color:var(--gold2); }
   <div class="panel active" id="panel-write">
     <div class="date-row" id="date-label">—</div>
 
-    <textarea id="entry-input" placeholder="Escribí lo que sea. El archivo no olvida nada." maxlength="3000"></textarea>
+    <textarea id="entry-input" placeholder="Contale a Carlitos. Él recuerda todo." maxlength="3000"></textarea>
 
     <!-- Photo upload (Pro only) -->
     <div class="photo-area" id="photo-area">
@@ -969,10 +969,10 @@ textarea:focus { border-color:var(--gold2); }
     </div>
 
     <div class="arch-box" id="arch-box">
-      <div class="arch-label"><span class="pulse"></span>El Archivista</div>
+      <div class="arch-label"><span class="pulse"></span>Carlitos</div>
       <div class="arch-text" id="arch-text"><div class="ldots"><span></span><span></span><span></span></div></div>
       <div class="kofi-row" id="kofi-row">
-        <span class="kofi-note">Si esto resonó</span>
+        <span class="kofi-note">Si Carlitos te voló la cabeza</span>
         <a href="https://ko-fi.com/nineplus" target="_blank" class="kofi-link">☕ $5 →</a>
       </div>
     </div>
@@ -1016,7 +1016,7 @@ textarea:focus { border-color:var(--gold2); }
 <!-- UPGRADE SCREEN -->
 <div id="upgrade-screen">
   <div class="upgrade-inner">
-    <div class="upgrade-eyebrow">El Archivo — Planes</div>
+    <div class="upgrade-eyebrow">Carlitos Pro</div>
     <div class="upgrade-title">El archivo <em>completo</em></div>
     <div class="upgrade-sub">Texto, fotos, patrones. Todo en el mismo lugar.</div>
     <div class="upgrade-divider"></div>
@@ -1059,12 +1059,12 @@ textarea:focus { border-color:var(--gold2); }
 
 <!-- INSIGHT OVERLAY -->
 <div id="insight-overlay">
-  <div class="io-eyebrow" id="io-ey">El Archivo — Síntesis</div>
+  <div class="io-eyebrow" id="io-ey">Carlitos tiene algo que decirte</div>
   <div class="io-dates" id="io-dates"></div>
   <div class="io-text" id="io-text"></div>
   <div class="io-line" id="io-line"></div>
   <div class="io-actions" id="io-actions">
-    <a href="https://ko-fi.com/nineplus" target="_blank" class="io-kofi">☕ Esto valió $5 →</a>
+    <a href="https://ko-fi.com/nineplus" target="_blank" class="io-kofi">☕ Apoyar a Carlitos ☕ $5 →</a>
     <button class="io-dismiss" onclick="dismissInsight()">Cerrar y continuar</button>
   </div>
 </div>
@@ -1092,7 +1092,7 @@ textarea:focus { border-color:var(--gold2); }
 
 <script>
 // ── STATE ──────────────────────────────────────────────────────
-const SK = 'archivo_final_v1';
+const SK = 'carlitos_v1';
 let state = JSON.parse(localStorage.getItem(SK) || 'null') || {
   entries: [], promises: [], pendingPromises: [],
   contradictions: [], versions: [],
@@ -1218,17 +1218,15 @@ async function saveEntry() {
 
   const hasPhotos = pendingPhotoData.length > 0;
 
-  const prompt = `Sos el Archivista. Registrás y cruzás entradas de un diario personal.
+  const prompt = `Sos Carlitos. Sos el amigo que recuerda todo y dice lo que nadie más se anima a decir. No humillás, no dañás, no juzgás — pero tampoco anestesiás. Decís lo que ves, directo, sin vueltas, como alguien que te quiere pero no te va a mentir.
 
-TONO: Notarial. Sereno. No sos terapeuta ni coach. Registrás hechos y los cruzás. Nunca usás: "noto que", "parece que", "es interesante", "quizás", "tal vez". No nombrás vicios. Solo cruzás y preguntás.
+TONO: Directo como un amigo, no como un terapeuta. Nada de "podría ser que", "quizás", "es interesante". Tampoco sos cruel ni sarcástico. Sos el que dice "pará, ¿te acordás que el mes pasado dijiste exactamente lo contrario?" — sin drama, solo los hechos.
 
 ${escalation}
 
-OPERATIVOS INTERNOS (nunca los mencionás):
-- Rorty: el vocabulario que alguien repite lo está construyendo. Lo rastreás en silencio.
-- Shklar: los patrones pequeños son más reveladores que los grandes. Los yuxtaponés, nunca los nombrás.
-
-${hasPhotos ? 'NOTA: El usuario adjuntó fotos a esta entrada. Analizalas en contexto con el texto y el historial. ¿Qué dice la foto sobre lo que escribe?' : ''}
+LO QUE SABÉS (no lo mencionás nunca):
+- El vocabulario que alguien repite lo está construyendo. Lo rastreás en silencio.
+- Los patrones pequeños dicen más que los grandes. Los ponés juntos sin nombrarlos.
 
 HISTORIAL (${n} entradas):
 ${historyCtx}
@@ -1239,14 +1237,14 @@ NUEVA ENTRADA [${dateShort}]:
 Devolvé SOLO este JSON, sin texto extra, sin backticks:
 {
   "internal_themes": ["3-5 temas internos, nunca visibles"],
-  "archivista": "2-3 oraciones notariales. Si hay historial: citá fecha y hecho concreto. Cerrá con UNA pregunta directa. Máx 65 palabras.${hasPhotos ? ' Si hay fotos: integralas al análisis como parte de la narrativa.' : ''}",
+  "archivista": "2-3 oraciones como un amigo directo. Si hay historial: citá fecha y hecho concreto sin explicar por qué lo citás. Cerrá con UNA pregunta que el usuario no querría responder pero necesita. Máx 65 palabras. Sin crueldad, sin anestesia.${hasPhotos ? ' Si hay fotos: integralas como parte natural de lo que observás.' : ''}",
   "promises": ["promesas reales detectadas. Máx 3. Array vacío si no hay."],
   "contradiction": {
     "found": true o false,
     "entry1_date": "fecha exacta",
     "entry1_text": "fragmento mínimo",
     "entry2_text": "fragmento mínimo de hoy",
-    "note": "una oración sin juicio"
+    "note": "una oración que pone las dos cosas juntas, sin juicio"
   }
 }`;
 
@@ -1517,14 +1515,11 @@ async function generateInterrogatorio() {
   c.innerHTML = `<div class="interro-wrap"><div class="interro-head"><span class="pulse"></span>Preparando interrogatorio...</div><div class="ldots"><span></span><span></span><span></span></div></div>`;
 
   const ctx = state.entries.slice(-15).map(e=>`[${e.dateShort}]: "${e.text}"`).join('\n');
-  const prompt = `Sos el Archivista. Generás 3 preguntas para un interrogatorio semanal.
+  const prompt = `Sos Carlitos. Generás 3 preguntas para el interrogatorio semanal.
 
-Buscás (sin mencionarlo):
-- Rorty: ¿hay vocabulario que ya es una trampa? ¿palabras que usa para no ver algo?
-- Shklar: ¿qué patrón se vuelve hábito? No lo nombrás. Solo preguntás. El usuario llega solo.
+Carlitos pregunta como un amigo que vio todo y no se va a quedar callado. Directo, sin crueldad, sin anestesia. Las preguntas van encadenadas — la primera abre, la segunda aprieta, la tercera va al hueso.
 
-Las preguntas: encadenadas, la primera abre, la segunda presiona, la tercera va al fondo.
-Lenguaje cotidiano. Sin diagnósticos.
+No nombrás patrones, no diagnosticás. Solo preguntás lo que nadie más preguntaría.
 
 HISTORIAL:
 ${ctx}
@@ -1620,20 +1615,19 @@ async function generateInsight(demo=false) {
   }, 200);
 
   const ctx = entries.map(e=>`[${e.dateShort}]: "${e.text}"`).join('\n');
-  const prompt = `Sos el Archivista. Generás una síntesis especial que cruza varias entradas y revela algo que solo se ve con distancia.
+  const prompt = `Sos Carlitos. Cada 3 días generás una síntesis — no una respuesta a una entrada, sino algo que cruzás de varias y decís directo, como un amigo que vio el patrón antes que vos.
 
 Reglas:
 - Cruzá al menos 3 entradas
-- Revelar un patrón invisible de cerca
-- Tono notarial, sin moralizar, sin nombrar vicios
+- Decí lo que ves sin rodeos, sin humillar, sin anestesia
 - Usá <em> para las palabras que más pesan
-- Máximo 42 palabras. Que cada una cuente.
-- Una sola idea. No dos.
+- Máximo 42 palabras. Una sola idea. Que duela un poco pero no lastime.
+- Sin moralizar. Sin nombrar vicios. Solo los hechos juntos.
 
 ENTRADAS:
 ${ctx}
 
-Devolvé SOLO el texto de la síntesis, sin JSON, sin comillas, sin explicación.`;
+Devolvé SOLO el texto, sin JSON, sin comillas, sin explicación.`;
 
   try {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
