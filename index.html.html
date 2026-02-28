@@ -58,14 +58,6 @@ header {
   position: relative;
 }
 
-header::after {
-  content:'✦';
-  position:absolute; bottom:-10px; left:50%;
-  transform:translateX(-50%);
-  background:var(--bg); padding:0 14px;
-  color:var(--gold2); font-size:12px;
-}
-
 .logo-row { display:flex; align-items:baseline; gap:16px; margin-bottom:8px; }
 
 .logo {
@@ -171,11 +163,9 @@ header::after {
   font-family:'JetBrains Mono', monospace;
   font-size:10px; color:var(--gold);
   letter-spacing:3px; text-transform:uppercase;
+  margin-top: 40px;
   margin-bottom:18px;
-  display:flex; align-items:center; gap:14px;
 }
-
-.date-row::after { content:''; flex:1; height:1px; background:var(--border2); }
 
 textarea {
   width:100%;
@@ -1110,18 +1100,6 @@ textarea:focus { border-color:var(--gold2); }
     <div class="tagline">Carlitos recuerda todo. <em>Todo.</em></div>
   </header>
 
-  <!-- STATS -->
-  <div class="stats">
-    <div class="stat"><div class="stat-n" id="sn-e">0</div><div class="stat-l">Entradas</div></div>
-    <div class="stat"><div class="stat-n" id="sn-d">0</div><div class="stat-l">Días activo</div></div>
-    <div class="stat"><div class="stat-n" id="sn-p">0</div><div class="stat-l">Personas</div></div>
-  </div>
-
-  <!-- NAV -->
-  <nav class="nav">
-    <button class="nav-tab active" onclick="switchTab('write')">Escribir</button>
-  </nav>
-
   <!-- WRITE -->
   <div class="panel active" id="panel-write">
     <div class="date-row" id="date-label">—</div>
@@ -1330,16 +1308,6 @@ function toggleAllEntries() {
 }
 
 function unlockTabs() {
-  // Stats
-  document.getElementById('sn-e').textContent = state.entries.length;
-  const days = state.entries.length > 0
-    ? new Set(state.entries.map(e => e.dateShort)).size
-    : 0;
-  document.getElementById('sn-d').textContent = days;
-  const peopleCount = Object.keys(state.people || {}).length;
-  document.getElementById('sn-p').textContent = peopleCount;
-
-  // Show/hide ver todo button
   const verTodo = document.getElementById('ver-todo-wrap');
   if (verTodo) verTodo.style.display = state.entries.length > 5 ? 'block' : 'none';
 }
