@@ -1305,10 +1305,26 @@ textarea:focus { border-color:var(--gold2); }
   <span class="footer-note">Lo que escribís lo lee Carlitos, no su creador · Datos guardados localmente en tu navegador</span>
   <div class="footer-btns">
     <button class="footer-btn" id="install-btn" onclick="installApp()" style="display:none">⊞ Instalar app</button>
+    <button class="footer-btn" onclick="showExport()">↓ Exportar</button>
     <button class="footer-btn upgrade" onclick="showUpgrade()">✦ Activar Pro</button>
     <button class="footer-btn danger" onclick="confirmDeleteAll()">Borrar archivo</button>
   </div>
 </footer>
+
+<!-- EXPORT MODAL -->
+<div id="export-modal" style="display:none;position:fixed;inset:0;background:rgba(10,8,6,0.97);z-index:9000;align-items:center;justify-content:center;padding:40px;">
+  <div style="max-width:420px;width:100%;">
+    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--text3);text-transform:uppercase;margin-bottom:24px;">Exportar archivo</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--text);margin-bottom:8px;">Tus datos, tus palabras.</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:36px;line-height:1.7;">Carlitos guarda todo localmente. Exportá cuando quieras.</div>
+    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
+      <button onclick="exportTXT()" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text);background:var(--card);border:1px solid var(--border2);padding:16px 24px;cursor:pointer;text-align:left;text-transform:uppercase;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)'">TXT — Texto plano, legible en cualquier lado</button>
+      <button onclick="exportJSON()" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text);background:var(--card);border:1px solid var(--border2);padding:16px 24px;cursor:pointer;text-align:left;text-transform:uppercase;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)'">JSON — Datos completos, importable en el futuro</button>
+      <button onclick="exportPDF()" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text);background:var(--card);border:1px solid var(--border2);padding:16px 24px;cursor:pointer;text-align:left;text-transform:uppercase;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)'">PDF — Para guardar o imprimir</button>
+    </div>
+    <button onclick="closeExport()" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text3);background:none;border:none;cursor:pointer;text-transform:uppercase;">Cerrar</button>
+  </div>
+</div>
 
 <script>
 // ── STATE ──────────────────────────────────────────────────────
@@ -2227,6 +2243,74 @@ function dismissWorldAlert() {
     overlay.classList.remove('visible');
     overlay.style.display = 'none';
   }, 1000);
+}
+
+// ── EXPORT ────────────────────────────────────────────────────
+function showExport() {
+  const m = document.getElementById('export-modal');
+  m.style.display = 'flex';
+}
+
+function closeExport() {
+  document.getElementById('export-modal').style.display = 'none';
+}
+
+function exportTXT() {
+  if (!state.entries.length) { showToast('No hay entradas todavía'); return; }
+  const lines = state.entries.map(e =>
+    `${e.date}\n${'─'.repeat(40)}\n${e.text}\n\nCarlitos:\n${e.response || '—'}\n\n`
+  ).join('\n');
+  download('carlitos-archivo.txt', lines, 'text/plain');
+  closeExport();
+}
+
+function exportJSON() {
+  if (!state.entries.length) { showToast('No hay entradas todavía'); return; }
+  const data = {
+    exportado: new Date().toISOString(),
+    entradas: state.entries,
+    personas: state.people
+  };
+  download('carlitos-archivo.json', JSON.stringify(data, null, 2), 'application/json');
+  closeExport();
+}
+
+function exportPDF() {
+  if (!state.entries.length) { showToast('No hay entradas todavía'); return; }
+  const win = window.open('', '_blank');
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <style>
+    body { font-family: Georgia, serif; max-width: 680px; margin: 60px auto; padding: 0 40px; color: #1a1a1a; line-height: 1.7; }
+    h1 { font-size: 32px; font-weight: 300; margin-bottom: 8px; }
+    .sub { font-size: 12px; color: #888; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 60px; }
+    .entry { margin-bottom: 48px; page-break-inside: avoid; }
+    .date { font-size: 10px; color: #888; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; }
+    .text { font-size: 16px; margin-bottom: 20px; }
+    .response { font-size: 14px; color: #555; border-left: 2px solid #c8a86a; padding-left: 16px; font-style: italic; }
+    .divider { border: none; border-top: 1px solid #e0e0e0; margin: 48px 0; }
+  </style></head><body>
+  <h1>Contale a Carlitos</h1>
+  <div class="sub">Archivo personal · ${new Date().toLocaleDateString('es-AR', {year:'numeric',month:'long',day:'numeric'})}</div>
+  ${state.entries.map(e => `
+    <div class="entry">
+      <div class="date">${e.date}</div>
+      <div class="text">${e.text.replace(/\n/g,'<br>')}</div>
+      ${e.response ? `<div class="response">${e.response.replace(/\n/g,'<br>')}</div>` : ''}
+    </div><hr class="divider">
+  `).join('')}
+  </body></html>`;
+  win.document.write(html);
+  win.document.close();
+  win.print();
+  closeExport();
+}
+
+function download(filename, content, type) {
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([content], { type }));
+  a.download = filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
 }
 
 // ── PWA ───────────────────────────────────────────────────────
