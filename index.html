@@ -1305,26 +1305,13 @@ textarea:focus { border-color:var(--gold2); }
   <span class="footer-note">Lo que escribís lo lee Carlitos, no su creador · Datos guardados localmente en tu navegador</span>
   <div class="footer-btns">
     <button class="footer-btn" id="install-btn" onclick="installApp()" style="display:none">⊞ Instalar app</button>
-    <button class="footer-btn" onclick="showExport()">↓ Exportar</button>
     <button class="footer-btn upgrade" onclick="showUpgrade()">✦ Activar Pro</button>
+    <button class="footer-btn" onclick="exportTXT()">TXT</button>
+    <button class="footer-btn" onclick="exportJSON()">JSON</button>
+    <button class="footer-btn" onclick="exportPDF()">PDF</button>
     <button class="footer-btn danger" onclick="confirmDeleteAll()">Borrar archivo</button>
   </div>
 </footer>
-
-<!-- EXPORT MODAL -->
-<div id="export-modal" style="display:none;position:fixed;inset:0;background:rgba(10,8,6,0.97);z-index:9000;align-items:center;justify-content:center;padding:40px;">
-  <div style="max-width:420px;width:100%;">
-    <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:4px;color:var(--text3);text-transform:uppercase;margin-bottom:24px;">Exportar archivo</div>
-    <div style="font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:300;color:var(--text);margin-bottom:8px;">Tus datos, tus palabras.</div>
-    <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--text3);margin-bottom:36px;line-height:1.7;">Carlitos guarda todo localmente. Exportá cuando quieras.</div>
-    <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:32px;">
-      <button onclick="exportTXT()" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text);background:var(--card);border:1px solid var(--border2);padding:16px 24px;cursor:pointer;text-align:left;text-transform:uppercase;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)'">TXT — Texto plano, legible en cualquier lado</button>
-      <button onclick="exportJSON()" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text);background:var(--card);border:1px solid var(--border2);padding:16px 24px;cursor:pointer;text-align:left;text-transform:uppercase;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)'">JSON — Datos completos, importable en el futuro</button>
-      <button onclick="exportPDF()" style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:2px;color:var(--text);background:var(--card);border:1px solid var(--border2);padding:16px 24px;cursor:pointer;text-align:left;text-transform:uppercase;transition:border-color 0.2s;" onmouseover="this.style.borderColor='var(--gold)'" onmouseout="this.style.borderColor='var(--border2)'">PDF — Para guardar o imprimir</button>
-    </div>
-    <button onclick="closeExport()" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text3);background:none;border:none;cursor:pointer;text-transform:uppercase;">Cerrar</button>
-  </div>
-</div>
 
 <script>
 // ── STATE ──────────────────────────────────────────────────────
@@ -2246,14 +2233,17 @@ function dismissWorldAlert() {
 }
 
 // ── EXPORT ────────────────────────────────────────────────────
-function showExport() {
-  const m = document.getElementById('export-modal');
-  m.style.display = 'flex';
+function toggleExportMenu() {
+  const m = document.getElementById('export-menu');
+  m.style.display = m.style.display === 'none' ? 'block' : 'none';
 }
 
-function closeExport() {
-  document.getElementById('export-modal').style.display = 'none';
-}
+document.addEventListener('click', e => {
+  if (!e.target.closest('#export-btn') && !e.target.closest('#export-menu')) {
+    const m = document.getElementById('export-menu');
+    if (m) m.style.display = 'none';
+  }
+});
 
 function exportTXT() {
   if (!state.entries.length) { showToast('No hay entradas todavía'); return; }
