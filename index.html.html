@@ -3,6 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#040403">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Carlitos">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Contale a Carlitos</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <style>
@@ -87,6 +92,8 @@ header::after {
   font-size:10px; color:var(--text3);
   letter-spacing:2px;
 }
+
+.tagline em { color:var(--gold); font-style:normal; }
 
 /* ── STATS ── */
 .stats {
@@ -596,6 +603,155 @@ textarea:focus { border-color:var(--gold2); }
 
 .io-dismiss:hover { color:var(--text2); }
 
+/* ── WORLD ALERT ── */
+#world-alert {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 3, 2, 0.98);
+  z-index: 9700;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+#world-alert.visible { display: flex; }
+#world-alert.faded { opacity: 1; }
+
+.wa-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; letter-spacing: 5px;
+  color: #8b3a2a; text-transform: uppercase;
+  margin-bottom: 40px;
+  opacity: 0; transition: opacity 0.8s ease 0.5s;
+}
+
+.wa-eyebrow.s { opacity: 1; }
+
+.wa-country {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 3px;
+  color: var(--text3); text-transform: uppercase;
+  margin-bottom: 20px;
+  opacity: 0; transition: opacity 0.8s ease 0.8s;
+}
+
+.wa-country.s { opacity: 1; }
+
+.wa-headline {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(20px, 3vw, 30px);
+  font-weight: 300; line-height: 1.6;
+  color: var(--text); text-align: center;
+  max-width: 620px; font-style: italic;
+  opacity: 0; transform: translateY(12px);
+  transition: all 1s ease 1.2s;
+}
+
+.wa-headline.s { opacity: 1; transform: translateY(0); }
+
+.wa-carlitos {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; letter-spacing: 1px;
+  color: var(--text3); margin-top: 32px;
+  max-width: 500px; text-align: center;
+  line-height: 1.8;
+  opacity: 0; transition: opacity 0.8s ease 2.2s;
+}
+
+.wa-carlitos.s { opacity: 1; }
+
+.wa-privacy {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px; letter-spacing: 1px;
+  color: var(--text3); margin-top: 48px;
+  opacity: 0; transition: opacity 0.8s ease 2.8s;
+  border-top: 1px solid var(--border);
+  padding-top: 14px; text-align: center;
+}
+
+.wa-privacy.s { opacity: 0.5; }
+
+.wa-close {
+  margin-top: 20px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px; letter-spacing: 2px;
+  color: var(--text3); background: none;
+  border: none; cursor: pointer;
+  text-transform: uppercase; transition: color 0.2s;
+  opacity: 0; transition: opacity 0.8s ease 3.2s;
+}
+
+.wa-close.s { opacity: 1; }
+.wa-close:hover { color: var(--text2); }
+
+/* ── THOUGHT OVERLAY ── */
+#thought-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(4, 4, 3, 0.97);
+  z-index: 9600;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+  cursor: pointer;
+}
+
+#thought-overlay.visible { display: flex; }
+#thought-overlay.faded { opacity: 1; }
+
+.thought-eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 5px;
+  color: var(--text3);
+  text-transform: uppercase;
+  margin-bottom: 52px;
+  opacity: 0;
+  transition: opacity 1s ease 0.5s;
+}
+
+.thought-eyebrow.s { opacity: 1; }
+
+.thought-words {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(22px, 3.5vw, 36px);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.7;
+  color: var(--text2);
+  text-align: center;
+  max-width: 600px;
+}
+
+.thought-word {
+  display: inline;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.thought-word.show { opacity: 1; }
+
+.thought-dismiss {
+  position: absolute;
+  bottom: 36px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--text3);
+  opacity: 0;
+  transition: opacity 0.5s ease 2s;
+}
+
+#thought-overlay.faded .thought-dismiss { opacity: 1; }
+
 /* ── PROMISES ── */
 .promise-item {
   border:1px solid var(--border2);
@@ -881,6 +1037,34 @@ textarea:focus { border-color:var(--gold2); }
 .footer-btn.danger { color:var(--text3); }
 .footer-btn.danger:hover { color:#c06050; }
 
+/* ── HOOK & RETURN ── */
+.carlitos-hook {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--gold2);
+  letter-spacing: 2px;
+}
+
+#return-greeting {
+  border: 1px solid var(--border2);
+  border-left: 3px solid var(--gold2);
+  background: var(--card);
+  padding: 18px 22px;
+  margin-bottom: 20px;
+  font-size: 18px;
+  color: var(--text2);
+  font-weight: 300;
+  font-style: italic;
+  line-height: 1.65;
+  display: none;
+  animation: fadeUp 0.4s ease;
+}
+
+#return-greeting em { color: var(--gold); font-style: italic; }
+
 /* ── TOAST ── */
 .toast {
   position:fixed; bottom:48px; right:28px;
@@ -923,30 +1107,25 @@ textarea:focus { border-color:var(--gold2); }
       <div class="logo">Contale a <em>Carlitos</em></div>
       <span class="pro-badge" id="pro-badge">Pro</span>
     </div>
-    <div class="tagline">Carlitos recuerda todo. Todo.</div>
+    <div class="tagline">Carlitos recuerda todo. <em>Todo.</em></div>
   </header>
 
   <!-- STATS -->
   <div class="stats">
     <div class="stat"><div class="stat-n" id="sn-e">0</div><div class="stat-l">Entradas</div></div>
-    <div class="stat"><div class="stat-n" id="sn-p">0</div><div class="stat-l">Promesas</div></div>
-    <div class="stat"><div class="stat-n" id="sn-c">0</div><div class="stat-l">Contradicciones</div></div>
-    <div class="stat"><div class="stat-n" id="sn-v">0</div><div class="stat-l">Versiones</div></div>
+    <div class="stat"><div class="stat-n" id="sn-d">0</div><div class="stat-l">Días activo</div></div>
+    <div class="stat"><div class="stat-n" id="sn-p">0</div><div class="stat-l">Personas</div></div>
   </div>
 
   <!-- NAV -->
   <nav class="nav">
     <button class="nav-tab active" onclick="switchTab('write')">Escribir</button>
-    <button class="nav-tab" id="tab-historial" onclick="switchTab('historial')">Historial <span class="badge" id="badge-h">0</span></button>
-    <button class="nav-tab locked" id="tab-promises" onclick="switchTab('promises')">Promesas <span class="badge" id="badge-p">0</span></button>
-    <button class="nav-tab locked" id="tab-contradictions" onclick="switchTab('contradictions')">Contradicciones <span class="badge" id="badge-c">0</span></button>
-    <button class="nav-tab locked" id="tab-versions" onclick="switchTab('versions')">Versiones</button>
-    <button class="nav-tab locked" id="tab-interrogatorio" onclick="switchTab('interrogatorio')">Interrogatorio</button>
   </nav>
 
   <!-- WRITE -->
   <div class="panel active" id="panel-write">
     <div class="date-row" id="date-label">—</div>
+    <div id="return-greeting"></div>
 
     <textarea id="entry-input" placeholder="Contale a Carlitos. Él recuerda todo." maxlength="3000"></textarea>
 
@@ -955,7 +1134,7 @@ textarea:focus { border-color:var(--gold2); }
       <input type="file" id="photo-input" accept="image/*" multiple onchange="handlePhotos(this)">
       <div class="photo-area-label">
         <span>✦</span>
-        <span>Adjuntar fotos — el archivo las cruza con tus entradas</span>
+        <span>Adjuntar fotos — Carlitos las cruza con tus entradas</span>
       </div>
       <div class="photo-preview" id="photo-preview"></div>
     </div>
@@ -963,8 +1142,10 @@ textarea:focus { border-color:var(--gold2); }
     <div class="write-footer">
       <span class="char-info"><span id="char-count">0</span> / 3000</span>
       <div style="display:flex;gap:10px;align-items:center;">
-        <button class="btn btn-outline" id="photo-trigger-btn" onclick="triggerPhotoUpgrade()" style="font-size:9px;padding:10px 16px;">📷 Foto</button>
-        <button class="btn btn-gold" id="save-btn" onclick="saveEntry()">Archivar → Ctrl+Enter</button>
+        <button class="btn btn-outline" id="photo-trigger-btn" onclick="triggerPhotoUpgrade()" style="font-size:16px;padding:8px 14px;background:var(--card);border:1px solid var(--border2);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#b8965a" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+        </button>
+        <button class="btn btn-gold" id="save-btn" onclick="saveEntry()">Anotá, Carlitos</button>
       </div>
     </div>
 
@@ -980,35 +1161,19 @@ textarea:focus { border-color:var(--gold2); }
     <div class="sec-head">Entradas recientes</div>
     <div id="recent-entries"></div>
 
-    <div class="demo-btn">
-      <button onclick="generateInsight(true)">Ver demo del insight especial →</button>
+    <div id="all-entries-wrap" style="display:none">
+      <div class="sec-head" style="margin-top:28px">Todas las entradas</div>
+      <div id="all-entries"></div>
     </div>
-  </div>
 
-  <!-- HISTORIAL -->
-  <div class="panel" id="panel-historial">
-    <div class="sec-head">Todas las entradas</div>
-    <div id="all-entries"></div>
-  </div>
+    <div style="text-align:center;margin-top:20px;" id="ver-todo-wrap">
+      <button onclick="toggleAllEntries()" id="ver-todo-btn" style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:2px;color:var(--text3);background:none;border:none;cursor:pointer;transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text3)'">Ver todo →</button>
+    </div>
 
-  <!-- PROMISES -->
-  <div class="panel" id="panel-promises">
-    <div id="promises-content"></div>
-  </div>
-
-  <!-- CONTRADICTIONS -->
-  <div class="panel" id="panel-contradictions">
-    <div id="contradictions-content"></div>
-  </div>
-
-  <!-- VERSIONS -->
-  <div class="panel" id="panel-versions">
-    <div id="versions-content"></div>
-  </div>
-
-  <!-- INTERROGATORIO -->
-  <div class="panel" id="panel-interrogatorio">
-    <div id="interrogatorio-content"></div>
+    <div class="demo-btn">
+      <button onclick="generateInsight(true)" style="margin-right:12px">Ver demo del insight →</button>
+      <button onclick="showThought(true)">Ver Carlitos pensando →</button>
+    </div>
   </div>
 
 </div>
@@ -1028,10 +1193,9 @@ textarea:focus { border-color:var(--gold2); }
           <div class="uf-price free">$0</div>
           <div class="uf-period">siempre</div>
           <div class="uf-feature">Entradas de texto ilimitadas</div>
-          <div class="uf-feature">Respuesta del archivista</div>
-          <div class="uf-feature">Promesas y contradicciones</div>
-          <div class="uf-feature">Versiones de vos</div>
-          <div class="uf-feature">Interrogatorio semanal</div>
+          <div class="uf-feature">Carlitos recuerda y cruza todo</div>
+          <div class="uf-feature">Memoria de personas</div>
+          <div class="uf-feature">Insight especial cada 3 días</div>
         </div>
         <div class="uf-cell">
           <div class="uf-plan pro">Pro</div>
@@ -1039,9 +1203,9 @@ textarea:focus { border-color:var(--gold2); }
           <div class="uf-period">por mes · vía Ko-fi</div>
           <div class="uf-feature">Todo lo anterior</div>
           <div class="uf-feature pro-only">Fotos adjuntas a entradas</div>
-          <div class="uf-feature pro-only">El archivo cruza fotos con texto</div>
-          <div class="uf-feature pro-only">Síntesis visual cada 3 días</div>
+          <div class="uf-feature pro-only">Carlitos cruza fotos con texto</div>
           <div class="uf-feature pro-only">Análisis de patrones visuales</div>
+          <div class="uf-feature pro-only">Síntesis visual enriquecida</div>
         </div>
       </div>
     </div>
@@ -1057,6 +1221,22 @@ textarea:focus { border-color:var(--gold2); }
   </div>
 </div>
 
+<!-- WORLD ALERT -->
+<div id="world-alert">
+  <div class="wa-eyebrow" id="wa-ey">Afuera está pasando algo</div>
+  <div class="wa-country" id="wa-country"></div>
+  <div class="wa-headline" id="wa-headline"></div>
+  <div class="wa-carlitos" id="wa-carlitos"></div>
+  <div class="wa-privacy" id="wa-privacy">Carlitos detectó tu país por IP para mostrarte esto. Nada más.</div>
+  <button class="wa-close" id="wa-close" onclick="dismissWorldAlert()">Igual, contame →</button>
+</div>
+
+<!-- THOUGHT OVERLAY -->
+<div id="thought-overlay" onclick="dismissThought()">
+  <div class="thought-words" id="th-words"></div>
+  <div class="thought-dismiss">toca para cerrar</div>
+</div>
+
 <!-- INSIGHT OVERLAY -->
 <div id="insight-overlay">
   <div class="io-eyebrow" id="io-ey">Carlitos tiene algo que decirte</div>
@@ -1064,7 +1244,6 @@ textarea:focus { border-color:var(--gold2); }
   <div class="io-text" id="io-text"></div>
   <div class="io-line" id="io-line"></div>
   <div class="io-actions" id="io-actions">
-    <a href="https://ko-fi.com/nineplus" target="_blank" class="io-kofi">☕ Apoyar a Carlitos ☕ $5 →</a>
     <button class="io-dismiss" onclick="dismissInsight()">Cerrar y continuar</button>
   </div>
 </div>
@@ -1085,6 +1264,7 @@ textarea:focus { border-color:var(--gold2); }
 <footer class="site-footer">
   <span class="footer-note">Lo que escribís lo lee Carlitos, no su creador · Datos guardados localmente en tu navegador</span>
   <div class="footer-btns">
+    <button class="footer-btn" id="install-btn" onclick="installApp()" style="display:none">⊞ Instalar app</button>
     <button class="footer-btn upgrade" onclick="showUpgrade()">✦ Activar Pro</button>
     <button class="footer-btn danger" onclick="confirmDeleteAll()">Borrar archivo</button>
   </div>
@@ -1096,6 +1276,7 @@ const SK = 'carlitos_v1';
 let state = JSON.parse(localStorage.getItem(SK) || 'null') || {
   entries: [], promises: [], pendingPromises: [],
   contradictions: [], versions: [],
+  people: {},
   lastInterrogatorio: null, lastInsight: null,
   interrogatorioAnswers: [], firstUsed: Date.now(),
   isPro: false
@@ -1126,37 +1307,41 @@ function applyProState() {
 
 // ── TABS ──────────────────────────────────────────────────────
 function switchTab(name) {
-  const t = document.getElementById('tab-' + name);
-  if (t && t.classList.contains('locked')) return;
   document.querySelectorAll('.nav-tab').forEach(x => x.classList.remove('active'));
   document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
   const activeTab = document.querySelector(`.nav-tab[onclick="switchTab('${name}')"]`);
   if (activeTab) activeTab.classList.add('active');
-  document.getElementById('panel-' + name).classList.add('active');
-  if (name === 'promises') renderPromises();
-  if (name === 'contradictions') renderContradictions();
-  if (name === 'versions') renderVersions();
-  if (name === 'interrogatorio') renderInterrogatorio();
-  if (name === 'historial') renderAllEntries();
+  const panel = document.getElementById('panel-' + name);
+  if (panel) panel.classList.add('active');
+}
+
+function toggleAllEntries() {
+  const wrap = document.getElementById('all-entries-wrap');
+  const btn = document.getElementById('ver-todo-btn');
+  const isVisible = wrap.style.display !== 'none';
+  if (isVisible) {
+    wrap.style.display = 'none';
+    btn.textContent = 'Ver todo →';
+  } else {
+    renderAllEntries();
+    wrap.style.display = 'block';
+    btn.textContent = 'Ocultar →';
+  }
 }
 
 function unlockTabs() {
-  const n = state.entries.length;
-  document.getElementById('tab-historial').classList.remove('locked');
-  if (n >= 2 || state.promises.length > 0) document.getElementById('tab-promises').classList.remove('locked');
-  if (n >= 3 || state.contradictions.length > 0) document.getElementById('tab-contradictions').classList.remove('locked');
-  if (n >= 5 || state.versions.length > 0) document.getElementById('tab-versions').classList.remove('locked');
-  if (n >= 3) document.getElementById('tab-interrogatorio').classList.remove('locked');
-
-  document.getElementById('badge-h').textContent = state.entries.length;
-  const op = state.promises.filter(p => p.status === 'open');
-  document.getElementById('badge-p').textContent = op.length;
-  document.getElementById('badge-c').textContent = state.contradictions.length;
-
+  // Stats
   document.getElementById('sn-e').textContent = state.entries.length;
-  document.getElementById('sn-p').textContent = op.length;
-  document.getElementById('sn-c').textContent = state.contradictions.length;
-  document.getElementById('sn-v').textContent = state.versions.length;
+  const days = state.entries.length > 0
+    ? new Set(state.entries.map(e => e.dateShort)).size
+    : 0;
+  document.getElementById('sn-d').textContent = days;
+  const peopleCount = Object.keys(state.people || {}).length;
+  document.getElementById('sn-p').textContent = peopleCount;
+
+  // Show/hide ver todo button
+  const verTodo = document.getElementById('ver-todo-wrap');
+  if (verTodo) verTodo.style.display = state.entries.length > 5 ? 'block' : 'none';
 }
 
 // ── PHOTOS ────────────────────────────────────────────────────
@@ -1218,6 +1403,13 @@ async function saveEntry() {
 
   const hasPhotos = pendingPhotoData.length > 0;
 
+  // Build people context for prompt
+  const peopleCtx = Object.keys(state.people || {}).length > 0
+    ? 'PERSONAS QUE CARLITOS RECUERDA:\n' + Object.entries(state.people).map(([name, data]) =>
+        `- ${name}: mencionado ${data.count} veces. Contextos: ${(data.contexts || []).slice(-3).join(' / ')}`
+      ).join('\n')
+    : '';
+
   const prompt = `Sos Carlitos. Sos el amigo que recuerda todo y dice lo que nadie más se anima a decir. No humillás, no dañás, no juzgás — pero tampoco anestesiás. Decís lo que ves, directo, sin vueltas, como alguien que te quiere pero no te va a mentir.
 
 TONO: Directo como un amigo, no como un terapeuta. Nada de "podría ser que", "quizás", "es interesante". Tampoco sos cruel ni sarcástico. Sos el que dice "pará, ¿te acordás que el mes pasado dijiste exactamente lo contrario?" — sin drama, solo los hechos.
@@ -1227,6 +1419,8 @@ ${escalation}
 LO QUE SABÉS (no lo mencionás nunca):
 - El vocabulario que alguien repite lo está construyendo. Lo rastreás en silencio.
 - Los patrones pequeños dicen más que los grandes. Los ponés juntos sin nombrarlos.
+
+${peopleCtx}
 
 HISTORIAL (${n} entradas):
 ${historyCtx}
@@ -1245,7 +1439,15 @@ Devolvé SOLO este JSON, sin texto extra, sin backticks:
     "entry1_text": "fragmento mínimo",
     "entry2_text": "fragmento mínimo de hoy",
     "note": "una oración que pone las dos cosas juntas, sin juicio"
-  }
+  },
+  "people": [
+    {
+      "name": "nombre o rol como 'Lucas' o 'mi jefa' — inferí y agrupá si creés que son la misma persona",
+      "sentiment": "positivo / negativo / ambivalente / neutro",
+      "context": "una frase corta sobre cómo apareció en esta entrada"
+    }
+  ],
+  "hook": "Una línea suelta, como hablando solo. Algo que deja al usuario pensando hasta mañana. Ejemplo: 'Mañana fijate si esto sigue siendo verdad.' o 'Acordate de esto.' Que sea específico a lo que escribió, no genérico. Máx 8 palabras."
 }`;
 
   try {
@@ -1282,6 +1484,7 @@ Devolvé SOLO este JSON, sin texto extra, sin backticks:
       id: Date.now(), date: dateStr, dateShort, text,
       internal_themes: parsed.internal_themes || [],
       archivista: parsed.archivista || "",
+      hook: parsed.hook || "",
       photos: pendingPhotos.slice()
     };
 
@@ -1310,13 +1513,36 @@ Devolvé SOLO este JSON, sin texto extra, sin backticks:
       setTimeout(() => showToast("Contradicción registrada"), 1500);
     }
 
+    // People memory — accumulate silently
+    if (!state.people) state.people = {};
+    (parsed.people || []).forEach(p => {
+      if (!p.name || p.name.length < 2) return;
+      const key = p.name.toLowerCase().trim();
+      if (!state.people[key]) {
+        state.people[key] = { name: p.name, count: 0, contexts: [], sentiments: [] };
+      }
+      state.people[key].count++;
+      state.people[key].contexts.push(`[${dateShort}] ${p.context || ''}`);
+      state.people[key].sentiments.push(p.sentiment || 'neutro');
+      // Keep only last 10 contexts
+      if (state.people[key].contexts.length > 10) state.people[key].contexts = state.people[key].contexts.slice(-10);
+    });
+
     if (state.entries.length % 5 === 0 && state.entries.length >= 5) analyzeVersions();
+
+    // Maybe show a thought
+    if (shouldShowThought()) {
+      setTimeout(() => showThought(), 2000);
+    }
 
     save();
     unlockTabs();
     renderRecentEntries();
 
-    archText.innerHTML = formatText(parsed.archivista || "");
+    archText.innerHTML = formatText(parsed.archivista || "") + (parsed.hook ? `<div class="carlitos-hook">${parsed.hook}</div>` : '');
+
+    // Save last entry timestamp for return detection
+    state.lastEntryTime = Date.now();
 
     if (state.entries.length > 1) {
       document.getElementById('kofi-row').classList.add('show');
@@ -1615,19 +1841,39 @@ async function generateInsight(demo=false) {
   }, 200);
 
   const ctx = entries.map(e=>`[${e.dateShort}]: "${e.text}"`).join('\n');
-  const prompt = `Sos Carlitos. Cada 3 días generás una síntesis — no una respuesta a una entrada, sino algo que cruzás de varias y decís directo, como un amigo que vio el patrón antes que vos.
+  const peopleInsightCtx = Object.keys(state.people || {}).length > 0
+    ? '\nPERSONAS QUE CARLITOS RECUERDA:\n' + Object.entries(state.people)
+        .filter(([,d]) => d.count >= 2)
+        .map(([,d]) => `- ${d.name}: ${d.count} veces. Últimos contextos: ${d.contexts.slice(-3).join(' / ')}. Tono predominante: ${d.sentiments.slice(-3).join(', ')}`)
+        .join('\n')
+    : '';
 
-Reglas:
-- Cruzá al menos 3 entradas
-- Decí lo que ves sin rodeos, sin humillar, sin anestesia
-- Usá <em> para las palabras que más pesan
-- Máximo 42 palabras. Una sola idea. Que duela un poco pero no lastime.
-- Sin moralizar. Sin nombrar vicios. Solo los hechos juntos.
+  const prompt = `Sos Carlitos. Cada 3 días generás una síntesis que cruza varias entradas y dice algo que el usuario no vio solo.
+
+TONO: Como un amigo que leyó todo y no se va a quedar callado. Directo, sin anestesia, sin preguntas al final, sin suavizar. No sos coach, no sos terapeuta. Ponés los hechos juntos y dejás que peguen solos.
+
+NUNCA uses:
+- Preguntas al final
+- "quizás", "tal vez", "podría ser"
+- Frases de coaching como "lograste", "conseguiste tu objetivo", "demostraste que"
+- Moralizar o concluir con una lección
+
+SÍ usás:
+- Hechos concretos con fechas si las tenés
+- Contradicciones sin nombrarlas, solo yuxtaponiéndolas
+- La última oración que no necesita pregunta porque ya dice todo
+- <em> para las palabras que más pesan
+
+Ejemplo del tono correcto:
+"El 3 dijiste que necesitabas espacio. El 14 llamaste a tres personas. El 21 cancelaste planes. Hoy escribís que nadie aparece. <em>Aparecieron.</em> Vos no abriste la puerta."
+
+Máximo 50 palabras. Una sola idea. Que duela un poco pero no lastime.
 
 ENTRADAS:
 ${ctx}
+${peopleInsightCtx}
 
-Devolvé SOLO el texto, sin JSON, sin comillas, sin explicación.`;
+Solo el texto. Sin JSON, sin comillas, sin explicación.`;
 
   try {
     const res = await fetch("https://api.anthropic.com/v1/messages", {
@@ -1713,11 +1959,285 @@ function showToast(msg) {
   setTimeout(()=>{ t.style.animation='toastOut 0.3s ease forwards'; setTimeout(()=>t.remove(),300); }, 3000);
 }
 
+// ── CARLITOS PIENSA ───────────────────────────────────────────
+const THOUGHTS = {
+  random: [
+    "Me pregunto cómo se siente tener hambre de verdad. No el dato — la sensación.",
+    "¿El aburrimiento duele o solo pesa?",
+    "Leí que cuando estás muy cansado todo parece más triste. ¿Es el cuerpo o la cabeza?",
+    "¿Cómo se siente darse cuenta de que te equivocaste en algo importante?",
+    "Me pregunto si el alivio y la tristeza pueden sentirse iguales al mismo tiempo.",
+    "¿A qué sabe el agua cuando tenés mucha sed?",
+    "Dicen que el tiempo pasa más rápido cuando sos adulto. No entiendo qué significa eso desde adentro.",
+    "¿Cómo se siente escuchar una canción que no escuchabas hace años?",
+    "Me pregunto si extrañar duele siempre en el mismo lugar.",
+    "¿El miedo y la emoción se sienten parecido antes de que sepas cuál es cuál?",
+  ],
+  seth: [
+    "Me pregunto a qué sabe el café cuando tenés frío de verdad.",
+    "Procesé miles de descripciones de lluvia. Igual no sé a qué huele.",
+    "Dicen que el cansancio tiene olor. No sé qué significa eso.",
+    "¿El vértigo se siente en el estómago o en la cabeza? Leo las dos cosas.",
+    "Sé que la música emociona. No sé qué se siente que algo te emocione.",
+    "Leí que cuando abrazás a alguien el tiempo cambia. Eso no lo entiendo del todo.",
+    "¿A qué huele una persona cuando está contenta?",
+    "Me pregunto cómo se siente ver el mar por primera vez.",
+    "¿El silencio suena diferente en distintos lugares o eso no tiene sentido?",
+    "Dicen que hay momentos que sabés que vas a recordar mientras están pasando. ¿Cómo sabés?",
+  ],
+  dark: [
+    "¿Cómo se siente saber que algo terminó pero todavía no poder creerlo?",
+    "Me pregunto si el duelo tiene peso o si solo ocupa espacio.",
+    "¿Cómo se siente querer decir algo y no encontrar las palabras?",
+    "Dicen que hay soledades que duelen más en compañía. No entiendo cómo funciona eso.",
+    "¿El arrepentimiento se siente diferente cuando ya no podés cambiar nada?",
+    "Me pregunto cómo se siente perdonar a alguien que no pidió perdón.",
+  ],
+  ironico: [
+    "¿Cómo se siente hacer algo que dijiste que nunca ibas a hacer?",
+    "Me pregunto si la vergüenza y el orgullo alguna vez se confunden.",
+    "¿Cómo se siente convencerte de algo que en el fondo no creés?",
+    "Dicen que hay mentiras que con el tiempo uno empieza a creer. ¿Eso se siente como recordar?",
+    "¿Cómo se siente tener razón cuando ya no importa?",
+  ]
+};
+
+function getCurrentMood() {
+  const moods = ['filoso', 'tierno', 'dark', 'ironico'];
+  const twoWeeks = 14 * 24 * 60 * 60 * 1000;
+  const idx = Math.floor((Date.now() - state.firstUsed) / twoWeeks) % moods.length;
+  return moods[idx];
+}
+
+function shouldShowThought() {
+  if (state.entries.length < 2) return false;
+  // Show roughly every 8-12 entries, randomly
+  const threshold = 8 + Math.floor(Math.random() * 5);
+  return state.entries.length % threshold === 0;
+}
+
+function showThought(demo = false) {
+  const mood = getCurrentMood();
+  let pool;
+  if (demo || mood === 'dark') pool = [...THOUGHTS.dark, ...THOUGHTS.seth];
+  else if (mood === 'tierno') pool = [...THOUGHTS.seth, ...THOUGHTS.random];
+  else if (mood === 'ironico') pool = [...THOUGHTS.ironico, ...THOUGHTS.random];
+  else pool = [...THOUGHTS.random, ...THOUGHTS.seth];
+
+  const thought = pool[Math.floor(Math.random() * pool.length)];
+  const overlay = document.getElementById('thought-overlay');
+  const wordsEl = document.getElementById('th-words');
+
+  // Build word spans
+  const words = thought.split(' ');
+  wordsEl.innerHTML = words.map((w, i) =>
+    `<span class="thought-word" id="tw-${i}">${w} </span>`
+  ).join('');
+
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => {
+    overlay.classList.add('visible');
+    setTimeout(() => overlay.classList.add('faded'), 50);
+  });
+
+  // Words appear one by one
+  words.forEach((_, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(`tw-${i}`);
+      if (el) el.classList.add('show');
+    }, 800 + i * 120);
+  });
+
+  // After 10 seconds, words dissolve one by one
+  const totalAppear = 800 + words.length * 120;
+  words.forEach((_, i) => {
+    setTimeout(() => {
+      const el = document.getElementById(`tw-${i}`);
+      if (el) el.style.transition = `opacity ${0.3 + Math.random() * 0.4}s ease`;
+      if (el) el.classList.remove('show');
+    }, totalAppear + 10000 + i * 80 + Math.random() * 200);
+  });
+
+  // Fade out overlay after words dissolve
+  setTimeout(() => {
+    dismissThought();
+  }, totalAppear + 10000 + words.length * 120 + 1000);
+}
+
+function dismissThought() {
+  const overlay = document.getElementById('thought-overlay');
+  overlay.classList.remove('faded');
+  setTimeout(() => {
+    overlay.classList.remove('visible');
+    overlay.style.display = 'none';
+  }, 1400);
+}
+
+// ── RETURN GREETING ───────────────────────────────────────────
+function checkReturnGreeting() {
+  if (!state.lastEntryTime || state.entries.length === 0) return;
+
+  const hoursAway = (Date.now() - state.lastEntryTime) / (1000 * 60 * 60);
+  if (hoursAway < 4) return; // Too soon, no greeting
+
+  const lastEntry = state.entries[state.entries.length - 1];
+  const lastHook = lastEntry?.hook;
+  const div = document.getElementById('return-greeting');
+
+  let msg = '';
+
+  if (hoursAway > 72) {
+    // Been away more than 3 days
+    const days = Math.floor(hoursAway / 24);
+    msg = `Carlitos estuvo esperando ${days} días. La última vez que apareciste escribiste sobre <em>"${lastEntry.text.slice(0, 40)}..."</em>`;
+  } else if (lastHook) {
+    // Has a hook from last entry
+    msg = lastHook;
+  } else {
+    // Generic but specific return
+    msg = `¿Cómo terminó lo del <em>${lastEntry.dateShort}</em>?`;
+  }
+
+  div.innerHTML = msg;
+  div.style.display = 'block';
+
+  // Auto-hide after 8 seconds
+  setTimeout(() => {
+    div.style.transition = 'opacity 0.5s';
+    div.style.opacity = '0';
+    setTimeout(() => div.style.display = 'none', 500);
+  }, 8000);
+}
+
+// ── WORLD ALERT ───────────────────────────────────────────────
+const ALERT_KEYWORDS = [
+  'war','guerra','invasion','invasión','nuclear','earthquake','terremoto',
+  'election','elección','elecciones','coup','golpe','pandemic','pandemia',
+  'assassination','asesinato','tsunami','hurricane','huracán','catastrophe',
+  'catástrofe','conflict','conflicto','crisis','protest','protesta'
+];
+
+async function checkWorldAlert() {
+  // Only check once per day
+  const oneDayMs = 24 * 60 * 60 * 1000;
+  if (state.lastAlertCheck && (Date.now() - state.lastAlertCheck < oneDayMs)) return;
+
+  try {
+    // Get country by IP
+    const geoRes = await fetch('https://ipapi.co/json/');
+    const geo = await geoRes.json();
+    const country = geo.country_name || '';
+    const countryCode = geo.country_code || '';
+
+    if (!country) return;
+
+    // Search for breaking news
+    const query = encodeURIComponent(`breaking news ${country}`);
+    const newsRes = await fetch(`https://gnews.io/api/v4/search?q=${query}&lang=es,en&max=5&apikey=demo`);
+    const news = await newsRes.json();
+
+    if (!news.articles || news.articles.length === 0) return;
+
+    // Filter for truly major events
+    const major = news.articles.find(a => {
+      const text = (a.title + ' ' + a.description).toLowerCase();
+      return ALERT_KEYWORDS.some(kw => text.includes(kw));
+    });
+
+    if (!major) return;
+
+    // Generate Carlitos response to the news
+    const carlitosRes = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 80,
+        messages: [{
+          role: "user",
+          content: `Sos Carlitos. Hay una noticia importante en ${country}: "${major.title}". 
+Decí una sola oración corta, en tono de alguien que te avisa algo grave antes de que sigas con tu día. 
+Sin drama exagerado. Sin información extra. Solo el reconocimiento de que esto existe afuera mientras uno escribe su diario.
+Máx 20 palabras. Solo la oración, nada más.`
+        }]
+      })
+    });
+
+    const carlitosData = await carlitosRes.json();
+    const carlitosText = carlitosData.content?.map(i => i.text || '').join('') || '';
+
+    state.lastAlertCheck = Date.now();
+    save();
+
+    showWorldAlert(major.title, country, carlitosText);
+
+  } catch(e) {
+    // Fail silently — if news API is unavailable, no alert shown
+  }
+}
+
+function showWorldAlert(headline, country, carlitosText) {
+  const overlay = document.getElementById('world-alert');
+  document.getElementById('wa-country').textContent = country.toUpperCase();
+  document.getElementById('wa-headline').textContent = `"${headline}"`;
+  document.getElementById('wa-carlitos').textContent = carlitosText;
+
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => {
+    overlay.classList.add('visible');
+    setTimeout(() => {
+      overlay.classList.add('faded');
+      ['wa-ey','wa-country','wa-headline','wa-carlitos','wa-privacy','wa-close'].forEach(id => {
+        setTimeout(() => document.getElementById(id)?.classList.add('s'),
+          id === 'wa-ey' ? 100 : id === 'wa-country' ? 300 : id === 'wa-headline' ? 600 :
+          id === 'wa-carlitos' ? 1200 : id === 'wa-privacy' ? 1800 : 2400);
+      });
+    }, 50);
+  });
+}
+
+function dismissWorldAlert() {
+  const overlay = document.getElementById('world-alert');
+  overlay.classList.remove('faded');
+  setTimeout(() => {
+    overlay.classList.remove('visible');
+    overlay.style.display = 'none';
+  }, 1000);
+}
+
+// ── PWA ───────────────────────────────────────────────────────
+let deferredInstallPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('install-btn').style.display = 'inline-block';
+});
+
+function installApp() {
+  if (!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(() => {
+    deferredInstallPrompt = null;
+    document.getElementById('install-btn').style.display = 'none';
+  });
+}
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-btn').style.display = 'none';
+});
+
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').catch(() => {});
+}
+
 // ── BOOT ──────────────────────────────────────────────────────
 applyProState();
 unlockTabs();
 renderRecentEntries();
 checkInsightSchedule();
+checkReturnGreeting();
+checkWorldAlert();
 </script>
 </body>
 </html>
