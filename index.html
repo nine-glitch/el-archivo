@@ -1317,10 +1317,46 @@ textarea:focus { border-color:var(--gold2); }
   </div>
 </footer>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
 <script>
 // ── STATE ──────────────────────────────────────────────────────
 const SK = 'carlitos_v1';
-let state = JSON.parse(localStorage.getItem(SK) || 'null') || {
+const EK = 'carlitos_ek';
+
+// Generar o recuperar clave de encriptación única por dispositivo
+function getEncryptionKey() {
+  let key = localStorage.getItem(EK);
+  if (!key) {
+    key = CryptoJS.lib.WordArray.random(256/8).toString();
+    localStorage.setItem(EK, key);
+  }
+  return key;
+}
+
+function encryptState(data) {
+  try {
+    return CryptoJS.AES.encrypt(JSON.stringify(data), getEncryptionKey()).toString();
+  } catch(e) { return JSON.stringify(data); }
+}
+
+function decryptState(raw) {
+  try {
+    // Intentar desencriptar primero
+    const bytes = CryptoJS.AES.decrypt(raw, getEncryptionKey());
+    return JSON.parse(bytes.toString(CryptoJS.enc.Utf8));
+  } catch(e) {
+    // Si falla (datos viejos sin encriptar), parsear directo
+    try { return JSON.parse(raw); } catch(e2) { return null; }
+  }
+}
+
+function loadState() {
+  const raw = localStorage.getItem(SK);
+  if (!raw) return null;
+  return decryptState(raw);
+}
+
+let state = loadState() || {
   entries: [], promises: [], pendingPromises: [],
   contradictions: [], versions: [],
   people: {}, onboardingDone: false,
@@ -1333,7 +1369,15 @@ let state = JSON.parse(localStorage.getItem(SK) || 'null') || {
 if (!state.pendingPromises) state.pendingPromises = [];
 if (!state.usage) state.usage = { month: null, calls: 0 };
 
-function save() { localStorage.setItem(SK, JSON.stringify(state)); }
+function save() { localStorage.setItem(SK, encryptState(state)); }
+
+// ── API HEADERS ───────────────────────────────────────────────
+function getApiHeaders() {
+  return {
+    "Content-Type": "application/json",
+    "x-user-id": getEncryptionKey().slice(0, 32)
+  };
+}
 
 // ── SOFT LIMITS ───────────────────────────────────────────────
 const LIMITS = { free: 30, pro: 200 };
@@ -1488,7 +1532,7 @@ async function saveEntry() {
   archText.innerHTML = '<div class="ldots"><span></span><span></span><span></span></div>';
   
 
-  const historyCtx = state.entries.slice(-20).map(e => `[${e.dateShort}]: "${e.text}"`).join('\n') || 'Sin historial previo.';
+  const historyCtx = state.entries.slice(-50).map(e => `[${e.dateShort}]: "${e.text}"`).join('\n') || 'Sin historial previo.';
   const n = state.entries.length;
 
   const escalation = n <= 2
@@ -1561,7 +1605,7 @@ Devolvé SOLO este JSON, sin texto extra, sin backticks:
 
     const res = await fetch("/api/proxy", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
         max_tokens: 1000,
@@ -1806,7 +1850,7 @@ JSON:
 
   try {
     const res = await fetch("/api/proxy", {
-      method:"POST", headers:{"Content-Type":"application/json"},
+      method:"POST", headers:getApiHeaders(),
       body: JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:800, messages:[{role:"user",content:prompt}] })
     });
     const data = await res.json();
@@ -1855,7 +1899,7 @@ Solo JSON.`;
 
   try {
     const res = await fetch("/api/proxy", {
-      method:"POST", headers:{"Content-Type":"application/json"},
+      method:"POST", headers:getApiHeaders(),
       body: JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:600, messages:[{role:"user",content:prompt}] })
     });
     const data = await res.json();
@@ -1977,7 +2021,7 @@ Solo el texto. Sin JSON, sin comillas, sin explicación.`;
 
   try {
     const res = await fetch("/api/proxy", {
-      method:"POST", headers:{"Content-Type":"application/json"},
+      method:"POST", headers:getApiHeaders(),
       body: JSON.stringify({ model:"claude-sonnet-4-6", max_tokens:200, messages:[{role:"user",content:prompt}] })
     });
     const data = await res.json();
@@ -2243,7 +2287,7 @@ async function checkWorldAlert() {
     // Generate Carlitos response to the news
     const carlitosRes = await fetch("/api/proxy", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getApiHeaders(),
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
         max_tokens: 80,
