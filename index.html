@@ -2689,10 +2689,30 @@ function getCancionDelMomento() {
 }
 
 // ── PRESENCIA MUSICAL AL ABRIR ─────────────────────────────────
+// ── LIBROS DE AUTOAYUDA — la contradicción ────────────────────
+const LIBROS_AUTOAYUDA = [
+  { texto: "Terminando «El secreto».", estado: "No sé qué decir." },
+  { texto: "Leyendo «Tus zonas erróneas».", estado: "Página 12. Ya no puedo más." },
+  { texto: "«El poder del ahora».", estado: "Capítulo 3. Mirando la pared." },
+  { texto: "Terminé «El alquimista».", estado: "Necesito aire." },
+  { texto: "«Actitud mental positiva».", estado: "Carlitos no responde." },
+  { texto: "«Los cuatro acuerdos».", estado: "Acuerdo uno. Pausa indefinida." },
+  { texto: "«El monje que vendió su Ferrari».", estado: "No entiendo nada." },
+  { texto: "«Despertando al gigante interior».", estado: "El gigante sigue dormido." },
+  { texto: "«La voz de tu alma».", estado: "Silencio." },
+  { texto: "«Usted puede sanar su vida».", estado: "Carlitos cierra el libro." },
+];
+
+function getPresenciaDelMomento() {
+  // 65% música, 25% libro de autoayuda, 10% silencio total
+  const r = Math.random();
+  if (r < 0.65) return { tipo: 'musica' };
+  if (r < 0.90) return { tipo: 'libro', data: LIBROS_AUTOAYUDA[Math.floor(Math.random() * LIBROS_AUTOAYUDA.length)] };
+  return { tipo: 'silencio' };
+}
+
 function showMusicPresence() {
-  const cancion = getCancionDelMomento();
-  state.cancionActual = cancion;
-  save();
+  const presencia = getPresenciaDelMomento();
 
   const el = document.createElement('div');
   el.id = 'music-presence';
@@ -2702,48 +2722,81 @@ function showMusicPresence() {
     padding:12px 20px; z-index:500;
     display:flex; align-items:center; gap:12px;
     opacity:0; transition:opacity 0.6s ease;
-    max-width:320px; width:calc(100% - 48px);
+    max-width:340px; width:calc(100% - 48px);
   `;
 
-  el.innerHTML = `
-    <div style="display:flex; gap:3px; align-items:flex-end; height:14px; flex-shrink:0;">
-      <span class="wave-bar"></span>
-      <span class="wave-bar"></span>
-      <span class="wave-bar"></span>
-      <span class="wave-bar"></span>
-    </div>
-    <div style="flex:1; min-width:0;">
-      <div style="font-family:'Cormorant Garamond',serif; font-size:13px;
-        font-style:italic; color:var(--text2); white-space:nowrap;
-        overflow:hidden; text-overflow:ellipsis;">
-        ${cancion.titulo}
+  if (presencia.tipo === 'musica') {
+    const cancion = getCancionDelMomento();
+    state.cancionActual = cancion;
+    save();
+
+    el.innerHTML = `
+      <div style="display:flex; gap:3px; align-items:flex-end; height:14px; flex-shrink:0;">
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
       </div>
-      <div style="font-family:'JetBrains Mono',monospace; font-size:9px;
-        letter-spacing:1px; color:var(--text3); margin-top:2px;">
-        ${cancion.artista.toUpperCase()}
+      <div style="flex:1; min-width:0;">
+        <div style="font-family:'Cormorant Garamond',serif; font-size:13px;
+          font-style:italic; color:var(--text2); white-space:nowrap;
+          overflow:hidden; text-overflow:ellipsis;">
+          ${cancion.titulo}
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9px;
+          letter-spacing:1px; color:var(--text3); margin-top:2px;">
+          ${cancion.artista.toUpperCase()}
+        </div>
       </div>
-    </div>
-  `;
+    `;
+
+    // Barras se detienen
+    setTimeout(() => {
+      el.querySelectorAll('.wave-bar').forEach(b => {
+        b.style.animationPlayState = 'paused';
+        b.style.height = '3px';
+      });
+      el.style.opacity = '0.4';
+    }, 2500);
+
+  } else if (presencia.tipo === 'libro') {
+    const libro = presencia.data;
+    el.innerHTML = `
+      <div style="flex:1; min-width:0;">
+        <div style="font-family:'Cormorant Garamond',serif; font-size:13px;
+          font-style:italic; color:var(--text2); line-height:1.5;">
+          ${libro.texto}
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace; font-size:9px;
+          letter-spacing:1px; color:var(--text3); margin-top:4px;">
+          ${libro.estado.toUpperCase()}
+        </div>
+      </div>
+    `;
+
+    // Se opaca después de 2.5s — Carlitos sigue absorto
+    setTimeout(() => { el.style.opacity = '0.35'; }, 2500);
+
+  } else {
+    // Silencio — solo un punto
+    el.style.cssText += 'justify-content:center;';
+    el.innerHTML = `
+      <div style="font-family:'JetBrains Mono',monospace; font-size:18px;
+        color:var(--text3); letter-spacing:4px;">·</div>
+    `;
+    setTimeout(() => { el.style.opacity = '0.3'; }, 1500);
+  }
 
   document.body.appendChild(el);
   requestAnimationFrame(() => { el.style.opacity = '1'; });
 
-  // 2.5s — barras se detienen, Carlitos te vio llegar
-  setTimeout(() => {
-    el.querySelectorAll('.wave-bar').forEach(b => {
-      b.style.animationPlayState = 'paused';
-      b.style.height = '3px';
-    });
-    el.style.opacity = '0.4';
-  }, 2500);
-
-  // 6s — desaparece
+  // Desaparece a los 6s
   setTimeout(() => {
     el.style.opacity = '0';
     setTimeout(() => el.remove(), 600);
   }, 6000);
 
-  // 3.2s — aparece micro-feedback si hay algo pendiente
+  // Micro-feedback a los 3.2s
   setTimeout(() => {
     maybeTriggerMicroFeedback();
   }, 3200);
