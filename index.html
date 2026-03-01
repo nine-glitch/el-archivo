@@ -1326,12 +1326,55 @@ let state = JSON.parse(localStorage.getItem(SK) || 'null') || {
   people: {}, onboardingDone: false,
   lastInterrogatorio: null, lastInsight: null,
   interrogatorioAnswers: [], firstUsed: Date.now(),
-  isPro: false
+  isPro: false,
+  usage: { month: null, calls: 0 }
 };
 
 if (!state.pendingPromises) state.pendingPromises = [];
+if (!state.usage) state.usage = { month: null, calls: 0 };
 
 function save() { localStorage.setItem(SK, JSON.stringify(state)); }
+
+// ── SOFT LIMITS ───────────────────────────────────────────────
+const LIMITS = { free: 30, pro: 200 };
+
+function getUsageMonth() {
+  const now = new Date();
+  return `${now.getFullYear()}-${now.getMonth()}`;
+}
+
+function trackCall() {
+  const month = getUsageMonth();
+  if (state.usage.month !== month) {
+    state.usage = { month, calls: 0 };
+  }
+  state.usage.calls++;
+  save();
+}
+
+function checkLimit() {
+  const month = getUsageMonth();
+  if (state.usage.month !== month) return { ok: true, calls: 0 };
+  const limit = state.isPro ? LIMITS.pro : LIMITS.free;
+  const calls = state.usage.calls;
+  if (calls >= limit) return { ok: false, calls, limit };
+  if (calls >= limit * 0.85) return { ok: true, calls, limit, warning: true };
+  return { ok: true, calls };
+}
+
+function showLimitWarning(calls, limit) {
+  const remaining = limit - calls;
+  showToast(`Carlitos te queda ${remaining} respuesta${remaining !== 1 ? 's' : ''} este mes.`);
+}
+
+function showLimitBlocked(limit) {
+  const isProUser = state.isPro;
+  const msg = isProUser
+    ? `Llegaste al límite de ${limit} consultas mensuales. Se reinicia el mes que viene.`
+    : `Llegaste al límite gratuito de ${limit} consultas. Activá Pro para continuar.`;
+  showToast(msg);
+  if (!isProUser) setTimeout(() => showUpgrade(), 1500);
+}
 
 // ── INIT ───────────────────────────────────────────────────────
 const today = new Date();
@@ -1428,6 +1471,13 @@ async function saveEntry() {
   const text = input.value.trim();
   if (!text) return;
 
+  // Verificar límite antes de llamar a la API
+  const limitCheck = checkLimit();
+  if (!limitCheck.ok) {
+    showLimitBlocked(limitCheck.limit);
+    return;
+  }
+
   const btn = document.getElementById('save-btn');
   btn.disabled = true;
   btn.textContent = 'Archivando...';
@@ -1436,7 +1486,7 @@ async function saveEntry() {
   const archText = document.getElementById('arch-text');
   archBox.classList.add('visible');
   archText.innerHTML = '<div class="ldots"><span></span><span></span><span></span></div>';
-  document.getElementById('kofi-row').classList.remove('show');
+  
 
   const historyCtx = state.entries.slice(-20).map(e => `[${e.dateShort}]: "${e.text}"`).join('\n') || 'Sin historial previo.';
   const n = state.entries.length;
@@ -1535,6 +1585,11 @@ Devolvé SOLO este JSON, sin texto extra, sin backticks:
     };
 
     state.entries.push(entry);
+    trackCall();
+
+    // Mostrar warning si está cerca del límite
+    const afterCheck = checkLimit();
+    if (afterCheck.warning) showLimitWarning(afterCheck.calls, afterCheck.limit);
 
     // Pending promises
     const detected = (parsed.promises || []).filter(p => p && p.length > 3);
@@ -1589,10 +1644,6 @@ Devolvé SOLO este JSON, sin texto extra, sin backticks:
 
     // Save last entry timestamp for return detection
     state.lastEntryTime = Date.now();
-
-    if (state.entries.length > 1) {
-      document.getElementById('kofi-row').classList.add('show');
-    }
 
     input.value = "";
     document.getElementById('char-count').textContent = "0";
