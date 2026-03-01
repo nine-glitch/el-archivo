@@ -2322,7 +2322,7 @@ const ALERT_KEYWORDS = [
   'catástrofe','conflict','conflicto','crisis','protest','protesta'
 ];
 
-async function checkWorldAlert() {
+async function // checkWorldAlert();  // comentado temporal para debug — gnews falla con apikey=demo
   // Only check once per day
   const oneDayMs = 24 * 60 * 60 * 1000;
   if (state.lastAlertCheck && (Date.now() - state.lastAlertCheck < oneDayMs)) return;
