@@ -2322,7 +2322,8 @@ const ALERT_KEYWORDS = [
   'catástrofe','conflict','conflicto','crisis','protest','protesta'
 ];
 
-async function // checkWorldAlert();  // comentado temporal para debug — gnews falla con apikey=demo
+async function checkWorldAlert() {
+  return; // Desactivado por ahora
   // Only check once per day
   const oneDayMs = 24 * 60 * 60 * 1000;
   if (state.lastAlertCheck && (Date.now() - state.lastAlertCheck < oneDayMs)) return;
@@ -2512,23 +2513,20 @@ if ('serviceWorker' in navigator) {
 const OB_SLIDES = [
   {
     html: `Carlitos no te va a preguntar cómo estás.`,
-    btn: '→',
-    delay: 2200
+    delay: 2800
   },
   {
     html: `Pero va a recordar.`,
-    btn: '→',
-    delay: 2000
+    delay: 2400
   },
   {
     html: `Le dijiste a la abuela Rosa que no ibas al cumpleaños porque <em>"estabas ocupado"</em>.<br><br><span class="ob-carlitos">Ocupado con qué, exactamente.<br><br>La curiosidad me mata.</span>`,
-    btn: '→',
-    delay: 3400
+    delay: 4000
   },
   {
-    html: `Escribí.`,
-    btn: '→',
-    delay: 1400
+    html: `No te juzgo.<br>Recuerdo.<br><br><em>Escribí.</em>`,
+    delay: 2200,
+    last: true
   }
 ];
 
@@ -2549,23 +2547,34 @@ function checkOnboarding() {
 function showObSlide(idx) {
   const slide = document.getElementById('ob-slide');
   const btn = document.getElementById('ob-btn');
+  const current = OB_SLIDES[idx];
 
   // Fade out
   slide.classList.remove('s');
   btn.classList.remove('s');
+  btn.style.display = 'none';
 
   setTimeout(() => {
-    slide.innerHTML = OB_SLIDES[idx].html;
-    btn.textContent = OB_SLIDES[idx].btn;
+    slide.innerHTML = current.html;
 
-    // Fade in
     requestAnimationFrame(() => {
       setTimeout(() => {
         slide.classList.add('s');
-        setTimeout(() => btn.classList.add('s'), OB_SLIDES[idx].delay);
+
+        if (current.last) {
+          // Último slide — mostrar botón para entrar
+          setTimeout(() => {
+            btn.textContent = '→';
+            btn.style.display = '';
+            btn.classList.add('s');
+          }, current.delay);
+        } else {
+          // Slides cinematicos — avanzan solos
+          setTimeout(() => obNext(), current.delay + 600);
+        }
       }, 100);
     });
-  }, idx === 0 ? 0 : 500);
+  }, idx === 0 ? 0 : 600);
 }
 
 function obNext() {
