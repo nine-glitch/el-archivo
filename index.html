@@ -1182,7 +1182,7 @@ textarea:focus { border-color:var(--gold2); }
     <div class="date-row" id="date-label">—</div>
     <div id="return-greeting"></div>
 
-    <textarea id="entry-input" placeholder="Contale a Carlitos. Él recuerda todo." maxlength="3000"></textarea>
+    <textarea id="entry-input" placeholder="Posteá. Él recuerda todo." maxlength="3000"></textarea>
 
     <!-- Photo upload (Pro only) -->
     <div class="photo-area" id="photo-area">
@@ -1211,7 +1211,7 @@ textarea:focus { border-color:var(--gold2); }
     </div>
 
     <div class="sec-head">
-      Entradas recientes
+      Posts recientes
       <div style="margin-left:auto;position:relative;">
         <button id="archive-menu-btn" onclick="toggleArchiveMenu()" style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);background:none;border:none;cursor:pointer;padding:0 4px;letter-spacing:2px;transition:color 0.2s;" onmouseover="this.style.color='var(--gold)'" onmouseout="this.style.color='var(--text3)'">···</button>
         <div id="archive-menu" style="display:none;position:absolute;top:20px;right:0;background:var(--card2);border:1px solid var(--border2);min-width:140px;z-index:9999;">
@@ -1602,14 +1602,14 @@ ${peopleCtx}
 HISTORIAL (${n} entradas):
 ${historyCtx}
 
-NUEVA ENTRADA [${dateShort}]:
+NUEVO POST [${dateShort}]:
 "${text}"
 
 Devolvé SOLO este JSON, sin texto extra, sin backticks:
 {
   "internal_themes": ["3-5 temas internos, nunca visibles al usuario"],
   "tono": "positivo / confrontacional / neutro / mixto",
-  "archivista": "2-3 oraciones. Si hay algo genuinamente positivo: decilo primero, con precisión, sin elogio vacío. Si hay historial relevante: citá fecha y hecho concreto. Cerrá con UNA pregunta que el usuario no querría responder — o con una observación que lo deje pensando si el tono es positivo. Máx 65 palabras. Sin crueldad. Sin anestesia. Sin coach.${hasPhotos ? ' Si hay fotos: integralas como parte natural de lo que observás.' : ''}",
+  "archivista": "Respondé al post como alguien que sigue el feed y recuerda todo. Si el post es corto y directo, respondé corto y directo. Si hay profundidad, entrá. Si hay historial relevante: citá fecha y hecho concreto. A veces una sola línea filosa vale más que tres párrafos. Si hay algo genuinamente positivo, decilo con precisión. Máx 65 palabras. Sin crueldad. Sin anestesia. Sin coach.${hasPhotos ? ' Si hay fotos: integralas como parte natural de lo que observás.' : ''}",
   "promises": ["promesas reales detectadas. Máx 3. Array vacío si no hay."],
   "contradiction": {
     "found": true o false,
@@ -1808,13 +1808,13 @@ function entryHTML(e) {
 function renderRecentEntries() {
   const c = document.getElementById('recent-entries');
   const r = [...state.entries].reverse().slice(0, 5);
-  c.innerHTML = r.length ? r.map(entryHTML).join('') : '<div class="empty">Todavía no hay entradas.</div>';
+  c.innerHTML = r.length ? r.map(entryHTML).join('') : '<div class="empty">Todavía no hay posts.</div>';
 }
 
 function renderAllEntries() {
   const c = document.getElementById('all-entries');
   const all = [...state.entries].reverse();
-  c.innerHTML = all.length ? all.map(entryHTML).join('') : '<div class="empty">Sin entradas.</div>';
+  c.innerHTML = all.length ? all.map(entryHTML).join('') : '<div class="empty">Sin posts.</div>';
 }
 
 // ── PROMISES ──────────────────────────────────────────────────
