@@ -46,7 +46,7 @@ export default async function handler(req) {
   const corsHeaders = {
     'Access-Control-Allow-Origin': corsOrigin,
     'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type',
+    'Access-Control-Allow-Headers': 'Content-Type, x-user-id',
   };
 
   // Preflight
@@ -54,9 +54,9 @@ export default async function handler(req) {
     return new Response(null, { status: 204, headers: corsHeaders });
   }
 
-  // Rate limiting por IP
-  const ip = req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
-  const { allowed, remaining } = getRateLimit(ip);
+  // Rate limiting por user_id (desde header) o IP como fallback
+  const userId = req.headers.get('x-user-id') || req.headers.get('x-forwarded-for')?.split(',')[0] || 'unknown';
+  const { allowed, remaining } = getRateLimit(userId);
 
   if (!allowed) {
     return new Response(
