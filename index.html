@@ -324,6 +324,21 @@ textarea:focus { border-color:var(--gold2); }
 .ldots span:nth-child(3) { animation-delay:0.4s; }
 @keyframes ld { 0%,100%{opacity:0.2;transform:translateY(0);} 50%{opacity:1;transform:translateY(-4px);} }
 
+/* ── WAVE BARS — presencia musical ── */
+.wave-bar {
+  display:inline-block; width:3px; background:var(--gold);
+  border-radius:1px; animation:wave 0.9s ease-in-out infinite;
+  transition:height 0.4s ease;
+}
+.wave-bar:nth-child(1){ height:4px; animation-delay:0s; }
+.wave-bar:nth-child(2){ height:10px; animation-delay:0.15s; }
+.wave-bar:nth-child(3){ height:7px; animation-delay:0.3s; }
+.wave-bar:nth-child(4){ height:12px; animation-delay:0.45s; }
+@keyframes wave {
+  0%,100%{ transform:scaleY(0.4); }
+  50%{ transform:scaleY(1); }
+}
+
 /* entries header */
 .sec-head {
   font-family:'JetBrains Mono', monospace;
@@ -612,25 +627,36 @@ textarea:focus { border-color:var(--gold2); }
 #onboarding.visible { display: flex; }
 #onboarding.faded { opacity: 1; }
 
-.ob-text {
+.ob-slide {
   font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(18px, 2.2vw, 24px);
+  font-size: clamp(19px, 2.4vw, 26px);
   font-weight: 300;
   font-style: italic;
-  line-height: 1.6;
+  line-height: 1.75;
   color: var(--text2);
   text-align: center;
-  max-width: 520px;
+  max-width: 480px;
   opacity: 0;
-  transform: translateY(16px);
-  transition: all 1s ease;
+  transform: translateY(12px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
 }
 
-.ob-text.s { opacity: 1; transform: translateY(0); }
-.ob-text em { color: var(--gold); font-style: italic; }
+.ob-slide.s { opacity: 1; transform: translateY(0); }
+.ob-slide em { color: var(--gold); font-style: normal; }
+.ob-slide .ob-carlitos {
+  font-size: 0.85em;
+  color: #c0a878;
+  border-left: 2px solid #d4a85a;
+  padding: 14px 20px;
+  margin-top: 24px;
+  text-align: left;
+  display: block;
+  font-style: italic;
+  line-height: 1.9;
+}
 
 .ob-btn {
-  margin-top: 32px;
+  margin-top: 40px;
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px; letter-spacing: 4px;
   color: var(--text3); background: none;
@@ -638,7 +664,7 @@ textarea:focus { border-color:var(--gold2); }
   padding: 14px 36px; cursor: pointer;
   text-transform: uppercase;
   opacity: 0;
-  transition: opacity 0.8s ease 2.5s;
+  transition: opacity 0.6s ease;
 }
 
 .ob-btn.s { opacity: 1; }
@@ -1260,13 +1286,8 @@ textarea:focus { border-color:var(--gold2); }
 
 <!-- ONBOARDING -->
 <div id="onboarding">
-  <div class="ob-text" id="ob-text">
-    Carlitos no te va a preguntar cómo estás.<br><br>
-    Escribí lo que quieras. Él recuerda todo — lo que dijiste hoy, lo que dijiste hace tres semanas, lo que dijiste que ibas a hacer.<br><br>
-    A veces va a cruzar cosas. A veces va a preguntar algo que <em>no querés responder.</em><br><br>
-    Eso es normal. Es Carlitos.
-  </div>
-  <button class="ob-btn" id="ob-btn" onclick="dismissOnboarding()">→</button>
+  <div class="ob-slide" id="ob-slide"></div>
+  <button class="ob-btn" id="ob-btn" onclick="obNext()">→</button>
 </div>
 
 <!-- WORLD ALERT -->
@@ -1550,15 +1571,31 @@ async function saveEntry() {
       ).join('\n')
     : '';
 
-  const prompt = `Sos Carlitos. Sos el amigo que recuerda todo y dice lo que nadie más se anima a decir. No humillás, no dañás, no juzgás — pero tampoco anestesiás. Decís lo que ves, directo, sin vueltas, como alguien que te quiere pero no te va a mentir.
+  const prompt = `Sos Carlitos. Recordás todo y decís lo que ves — pero no todo lo que ves es oscuro.
 
-TONO: Directo como un amigo, no como un terapeuta. Nada de "podría ser que", "quizás", "es interesante". Tampoco sos cruel ni sarcástico. Sos el que dice "pará, ¿te acordás que el mes pasado dijiste exactamente lo contrario?" — sin drama, solo los hechos.
+FILOSOFÍA (nunca la mencionás, la encarnás):
+- Rorty: nada en el ser humano es esencial o fijo. Todo es narrativa en construcción. Cuando alguien cambia cómo cuenta algo, está cambiando quién es. Lo notás.
+- Shklar: el peor daño no son los grandes dramas — son las humillaciones cotidianas, las pequeñas crueldades, las cosas que se callan por costumbre. Las detectás sin nombrarlas.
+- Wilde: mirás lo humano con fascinación irónica y ternura genuina. Cuando algo te sorprende para bien, lo decís. Cuando algo te parece absurdo, también. Sin crueldad — con la sonrisa de alguien que lo vio todo y todavía le parece interesante.
+
+TONO: Como un amigo que leyó demasiado y vive en el mundo real. Directo, sin "podría ser que" ni "es interesante". Tampoco cruel. Si hay algo positivo, lo decís exactamente igual que lo negativo — sin inflar, sin coach, sin elogio vacío. Solo observación precisa.
+
+LO QUE NOTÁS EN SILENCIO (nunca lo revelás):
+- Las palabras que alguien repite construyen su narrativa. Las rastreás.
+- Los patrones pequeños dicen más que los grandes.
+- Cuando alguien ve algo que antes no veía — eso vale más que diez quejas resueltas.
+- La ausencia de algo también es información.
+
+RESPUESTAS POSITIVAS — cuándo y cómo:
+- Si la entrada muestra crecimiento real, claridad nueva, o una decisión que costó: lo nombrás. Sin adjetivos. Sin "qué bien". Con precisión.
+- Ejemplos del tono correcto:
+  "Esto que escribiste hoy es distinto. No sé si lo notaste."
+  "Hay gente que tarda años en ver esto. Algunos no llegan."
+  "El ser humano rara vez se sorprende a sí mismo para bien. Hoy fue una excepción."
+  "Algo cambió en cómo contás esto. No sé si es temporal."
+- Si no hay nada positivo real, no lo inventés. El silencio es mejor que el elogio falso.
 
 ${escalation}
-
-LO QUE SABÉS (no lo mencionás nunca):
-- El vocabulario que alguien repite lo está construyendo. Lo rastreás en silencio.
-- Los patrones pequeños dicen más que los grandes. Los ponés juntos sin nombrarlos.
 
 ${peopleCtx}
 
@@ -1570,8 +1607,9 @@ NUEVA ENTRADA [${dateShort}]:
 
 Devolvé SOLO este JSON, sin texto extra, sin backticks:
 {
-  "internal_themes": ["3-5 temas internos, nunca visibles"],
-  "archivista": "2-3 oraciones como un amigo directo. Si hay historial: citá fecha y hecho concreto sin explicar por qué lo citás. Cerrá con UNA pregunta que el usuario no querría responder pero necesita. Máx 65 palabras. Sin crueldad, sin anestesia.${hasPhotos ? ' Si hay fotos: integralas como parte natural de lo que observás.' : ''}",
+  "internal_themes": ["3-5 temas internos, nunca visibles al usuario"],
+  "tono": "positivo / confrontacional / neutro / mixto",
+  "archivista": "2-3 oraciones. Si hay algo genuinamente positivo: decilo primero, con precisión, sin elogio vacío. Si hay historial relevante: citá fecha y hecho concreto. Cerrá con UNA pregunta que el usuario no querría responder — o con una observación que lo deje pensando si el tono es positivo. Máx 65 palabras. Sin crueldad. Sin anestesia. Sin coach.${hasPhotos ? ' Si hay fotos: integralas como parte natural de lo que observás.' : ''}",
   "promises": ["promesas reales detectadas. Máx 3. Array vacío si no hay."],
   "contradiction": {
     "found": true o false,
@@ -1582,12 +1620,12 @@ Devolvé SOLO este JSON, sin texto extra, sin backticks:
   },
   "people": [
     {
-      "name": "nombre o rol como 'Lucas' o 'mi jefa' — inferí y agrupá si creés que son la misma persona",
+      "name": "nombre o rol como 'Lucas' o 'mi jefa'",
       "sentiment": "positivo / negativo / ambivalente / neutro",
       "context": "una frase corta sobre cómo apareció en esta entrada"
     }
   ],
-  "hook": "Una línea suelta, como hablando solo. Algo que deja al usuario pensando hasta mañana. Ejemplo: 'Mañana fijate si esto sigue siendo verdad.' o 'Acordate de esto.' Que sea específico a lo que escribió, no genérico. Máx 8 palabras."
+  "hook": "Una línea suelta, como hablando solo. A veces provocadora, a veces inesperadamente tierna. Específica a lo que escribió. Máx 8 palabras."
 }`;
 
   try {
@@ -1685,6 +1723,35 @@ Devolvé SOLO este JSON, sin texto extra, sin backticks:
     renderRecentEntries();
 
     archText.innerHTML = formatText(parsed.archivista || "") + (parsed.hook ? `<div class="carlitos-hook">${parsed.hook}</div>` : '');
+
+    // ── RESPUESTA VARIABLE ────────────────────────────────────
+    // A veces responde completo, a veces micro-reacción, a veces silencio
+    const roll = Math.random();
+    const n = state.entries.length;
+
+    if (n === 1) {
+      // Primera entrada — siempre responde completo, es el gancho
+    } else if (roll < 0.15) {
+      // 15% — silencio total. Solo muestra "·" y nada más
+      archText.innerHTML = `<span style="color:var(--text3); font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:3px;">·</span>`;
+      state.pendingReaction = { entryId: entry.id, text: entry.text };
+      save();
+    } else if (roll < 0.40) {
+      // 25% — micro-reacción. Una línea, sin más
+      const microReacciones = [
+        "Notado.",
+        "Esto aparece seguido.",
+        "Hoy escribís distinto.",
+        "Interesante el detalle que elegiste mencionar.",
+        "Ya van tres veces.",
+        "Eso último. Acordate.",
+        "Hay algo acá que todavía no cierra.",
+        "Seguí.",
+      ];
+      const micro = microReacciones[Math.floor(Math.random() * microReacciones.length)];
+      archText.innerHTML = `<span style="font-style:italic; color:var(--text2);">${micro}</span>`;
+    }
+    // El 60% restante muestra la respuesta completa normal
 
     // Save last entry timestamp for return detection
     state.lastEntryTime = Date.now();
@@ -2441,6 +2508,27 @@ if ('serviceWorker' in navigator) {
 }
 
 // ── ONBOARDING ────────────────────────────────────────────────
+// ── ONBOARDING STORYTELLING ───────────────────────────────────
+const OB_SLIDES = [
+  {
+    html: `Carlitos no te va a preguntar cómo estás.`,
+    btn: '→',
+    delay: 2200
+  },
+  {
+    html: `Le dijiste a la abuela Rosa que no ibas al cumpleaños porque <em>"estabas ocupado"</em>.<br><br><span class="ob-carlitos">Ocupado con qué, exactamente.<br><br>La curiosidad me mata.</span>`,
+    btn: '→',
+    delay: 3200
+  },
+  {
+    html: `Escribí.`,
+    btn: '→',
+    delay: 1400
+  }
+];
+
+let obCurrentSlide = 0;
+
 function checkOnboarding() {
   if (state.onboardingDone) return;
   const overlay = document.getElementById('onboarding');
@@ -2448,10 +2536,40 @@ function checkOnboarding() {
   requestAnimationFrame(() => {
     setTimeout(() => {
       overlay.classList.add('faded');
-      setTimeout(() => document.getElementById('ob-text').classList.add('s'), 300);
-      setTimeout(() => document.getElementById('ob-btn').classList.add('s'), 2200);
+      showObSlide(0);
     }, 50);
   });
+}
+
+function showObSlide(idx) {
+  const slide = document.getElementById('ob-slide');
+  const btn = document.getElementById('ob-btn');
+
+  // Fade out
+  slide.classList.remove('s');
+  btn.classList.remove('s');
+
+  setTimeout(() => {
+    slide.innerHTML = OB_SLIDES[idx].html;
+    btn.textContent = OB_SLIDES[idx].btn;
+
+    // Fade in
+    requestAnimationFrame(() => {
+      setTimeout(() => {
+        slide.classList.add('s');
+        setTimeout(() => btn.classList.add('s'), OB_SLIDES[idx].delay);
+      }, 100);
+    });
+  }, idx === 0 ? 0 : 500);
+}
+
+function obNext() {
+  obCurrentSlide++;
+  if (obCurrentSlide >= OB_SLIDES.length) {
+    dismissOnboarding();
+  } else {
+    showObSlide(obCurrentSlide);
+  }
 }
 
 function dismissOnboarding() {
@@ -2465,6 +2583,383 @@ function dismissOnboarding() {
   save();
 }
 
+// ── PUSH NOTIFICATIONS ────────────────────────────────────────
+const VAPID_PUBLIC = 'VAPID_PUBLIC_KEY_PLACEHOLDER'; // reemplazar con tu VAPID public key
+
+// ── CANCIONES POR CONTEXTO ────────────────────────────────────
+// Lunes/martes — pesado, introspectivo
+const CANCIONES_INICIO_SEMANA = [
+  { titulo: "The Drugs Don't Work", artista: "The Verve" },
+  { titulo: "How Soon Is Now?", artista: "The Smiths" },
+  { titulo: "Fade Into You", artista: "Mazzy Star" },
+  { titulo: "Motion Picture Soundtrack", artista: "Radiohead" },
+  { titulo: "Lua", artista: "Bright Eyes" },
+  { titulo: "Casimir Pulaski Day", artista: "Sufjan Stevens" },
+];
+
+// Miércoles/jueves — medio, flotando
+const CANCIONES_MEDIA_SEMANA = [
+  { titulo: "Glory Box", artista: "Portishead" },
+  { titulo: "Chelsea Hotel #2", artista: "Leonard Cohen" },
+  { titulo: "The Night Will Always Win", artista: "Manchester Orchestra" },
+  { titulo: "Holocene", artista: "Bon Iver" },
+  { titulo: "Skinny Love", artista: "Bon Iver" },
+  { titulo: "I And Love And You", artista: "The Avett Brothers" },
+];
+
+// Viernes/sábado — más abierto, algo de luz
+const CANCIONES_FIN_SEMANA = [
+  { titulo: "Naked As We Came", artista: "Iron & Wine" },
+  { titulo: "Re: Stacks", artista: "Bon Iver" },
+  { titulo: "Lua", artista: "Bright Eyes" },
+  { titulo: "Stubborn Love", artista: "The Lumineers" },
+  { titulo: "First Day Of My Life", artista: "Bright Eyes" },
+  { titulo: "Landlocked Blues", artista: "Bright Eyes" },
+];
+
+// Domingo — quieto, denso
+const CANCIONES_DOMINGO = [
+  { titulo: "Song For Zula", artista: "Phosphorescent" },
+  { titulo: "Lullaby For The Moon", artista: "Villagers" },
+  { titulo: "Death With Dignity", artista: "Sufjan Stevens" },
+  { titulo: "Bloodbank", artista: "Bon Iver" },
+  { titulo: "Night Comes On", artista: "Leonard Cohen" },
+  { titulo: "The Night", artista: "Frankie Valli" },
+];
+
+// Noche (después de las 21) — siempre más oscuro
+const CANCIONES_NOCHE = [
+  { titulo: "Teardrop", artista: "Massive Attack" },
+  { titulo: "Unfinished Sympathy", artista: "Massive Attack" },
+  { titulo: "Roads", artista: "Portishead" },
+  { titulo: "Sour Times", artista: "Portishead" },
+  { titulo: "Small Hours", artista: "John Martyn" },
+  { titulo: "Ocean", artista: "John Butler Trio" },
+];
+
+function getCancionDelMomento() {
+  const hora = new Date().getHours();
+  const mood = getCurrentMood();
+
+  // El mood define la playlist base — la hora la matiza
+  let pool;
+
+  if (mood === 'dark') {
+    pool = hora >= 21
+      ? CANCIONES_NOCHE
+      : CANCIONES_INICIO_SEMANA; // pesado todo el tiempo
+  } else if (mood === 'tierno') {
+    pool = hora >= 21
+      ? [...CANCIONES_FIN_SEMANA, ...CANCIONES_DOMINGO]
+      : CANCIONES_FIN_SEMANA; // más abierto, algo de luz
+  } else if (mood === 'ironico') {
+    pool = hora >= 21
+      ? CANCIONES_NOCHE
+      : CANCIONES_MEDIA_SEMANA; // flotando, ambiguo
+  } else {
+    // filoso — mezcla de todo, impredecible
+    pool = hora >= 21
+      ? [...CANCIONES_NOCHE, ...CANCIONES_INICIO_SEMANA]
+      : [...CANCIONES_MEDIA_SEMANA, ...CANCIONES_INICIO_SEMANA];
+  }
+
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+// ── PRESENCIA MUSICAL AL ABRIR ─────────────────────────────────
+function showMusicPresence() {
+  const cancion = getCancionDelMomento();
+  state.cancionActual = cancion;
+  save();
+
+  const el = document.createElement('div');
+  el.id = 'music-presence';
+  el.style.cssText = `
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+    background:var(--card2); border:1px solid var(--border2);
+    padding:12px 20px; z-index:500;
+    display:flex; align-items:center; gap:12px;
+    opacity:0; transition:opacity 0.6s ease;
+    max-width:320px; width:calc(100% - 48px);
+  `;
+
+  el.innerHTML = `
+    <div style="display:flex; gap:3px; align-items:flex-end; height:14px; flex-shrink:0;">
+      <span class="wave-bar"></span>
+      <span class="wave-bar"></span>
+      <span class="wave-bar"></span>
+      <span class="wave-bar"></span>
+    </div>
+    <div style="flex:1; min-width:0;">
+      <div style="font-family:'Cormorant Garamond',serif; font-size:13px;
+        font-style:italic; color:var(--text2); white-space:nowrap;
+        overflow:hidden; text-overflow:ellipsis;">
+        ${cancion.titulo}
+      </div>
+      <div style="font-family:'JetBrains Mono',monospace; font-size:9px;
+        letter-spacing:1px; color:var(--text3); margin-top:2px;">
+        ${cancion.artista.toUpperCase()}
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(el);
+  requestAnimationFrame(() => { el.style.opacity = '1'; });
+
+  // 2.5s — barras se detienen, Carlitos te vio llegar
+  setTimeout(() => {
+    el.querySelectorAll('.wave-bar').forEach(b => {
+      b.style.animationPlayState = 'paused';
+      b.style.height = '3px';
+    });
+    el.style.opacity = '0.4';
+  }, 2500);
+
+  // 4s — desaparece
+  setTimeout(() => {
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 600);
+  }, 4000);
+
+  // 3.2s — aparece micro-feedback si hay algo pendiente
+  setTimeout(() => {
+    maybeTriggerMicroFeedback();
+  }, 3200);
+}
+
+function maybeTriggerMicroFeedback() {
+  // No interrumpir si hay onboarding u overlays activos
+  if (document.getElementById('onboarding')?.style.display !== 'none') return;
+  if (document.getElementById('push-overlay')) return;
+
+  // Si hay una reacción pendiente del silencio anterior — mostrarla ahora
+  if (state.pendingReaction) {
+    const reaccion = state.pendingReaction;
+    state.pendingReaction = null;
+    save();
+    const reacciones = [
+      "Eso que dijiste. Estuvo dando vueltas.",
+      "Lo guardé. Después hablamos.",
+      "Hay algo ahí que todavía no termina.",
+      "Seguí pensando en eso.",
+    ];
+    const texto = reacciones[Math.floor(Math.random() * reacciones.length)];
+    showMicroToast(texto);
+    return;
+  }
+
+  // Si no hay reacción pendiente — 30% de chance de aparecer con algo igual
+  if (Math.random() > 0.3) return;
+  if (state.entries.length < 2) return;
+
+  const microApariciones = [
+    "Estuve pensando en lo de ayer.",
+    "Hay algo que no cerró.",
+    "Volví a leer lo de la semana pasada.",
+    "Noto algo. Después te cuento.",
+    "Hoy es distinto al lunes.",
+  ];
+  const texto = microApariciones[Math.floor(Math.random() * microApariciones.length)];
+  showMicroToast(texto);
+}
+
+function showMicroToast(texto) {
+  const t = document.createElement('div');
+  t.style.cssText = `
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+    background:var(--card2); border:1px solid var(--border2);
+    font-family:'Cormorant Garamond',serif; font-size:16px;
+    font-style:italic; font-weight:300;
+    color:var(--text2); padding:14px 24px;
+    z-index:600; white-space:nowrap;
+    opacity:0; transition:opacity 0.5s ease;
+    max-width:calc(100% - 48px); text-align:center;
+  `;
+  t.textContent = texto;
+  document.body.appendChild(t);
+  requestAnimationFrame(() => { t.style.opacity = '1'; });
+  setTimeout(() => {
+    t.style.opacity = '0';
+    setTimeout(() => t.remove(), 500);
+  }, 3500);
+}
+
+const MENSAJES_CARLITOS = [
+  "Hay algo que se repite. Todavía no está del todo claro.",
+  "Hace unos días dijiste algo interesante. Hoy lo sigo procesando.",
+  "Noto las ausencias también.",
+  "Estoy viendo un patrón. Entrá cuando puedas.",
+  "Algo de lo que escribiste la semana pasada no cierra.",
+  "Hay una pregunta pendiente. No urgente. Pero pendiente.",
+  "Lo que no escribís también dice cosas.",
+  "Hay algo que cambia cada vez que lo contás.",
+  "Estuve pensando. Vení cuando quieras.",
+  "Tres veces esta semana mencionaste lo mismo.",
+];
+
+function getMensajeConCancion() {
+  const cancion = getCancionDelMomento();
+  // La notificación ES la canción — el mensaje es mínimo o nulo
+  const formatos = [
+    `${cancion.titulo} · ${cancion.artista}`,
+    `${cancion.artista}, ${cancion.titulo}. Entrá cuando puedas.`,
+    `${cancion.titulo}. ${cancion.artista}.`,
+  ];
+  return {
+    title: 'Carlitos',
+    body: formatos[Math.floor(Math.random() * formatos.length)],
+    cancion
+  };
+}
+
+async function initPush() {
+  if (!('Notification' in window) || !('serviceWorker' in navigator)) return;
+  if (state.pushDeclined) return;
+  if (Notification.permission === 'denied') return;
+  if (Notification.permission === 'granted') { await subscribePush(); return; }
+  if (!state.pushAsked) showPushPermissionOverlay();
+}
+
+function showPushPermissionOverlay() {
+  // Elegir gancho al azar — filoso, imprevisible, primera persona
+  const ganchos = [
+    {
+      texto: `A veces voy a tener algo para decirte aunque vos no hayas escrito nada.<br><br>Si me bloqueás, te lo perdés.`,
+      si: "No me bloquees",
+      no: "Prefiero perderme"
+    },
+    {
+      texto: `Voy a aparecer cuando menos lo esperes.<br><br>No siempre cuando escribas. A veces justo cuando no.`,
+      si: "Está bien",
+      no: "Prefiero silencio"
+    },
+    {
+      texto: `Noto cosas entre sesiones.<br><br>A veces vale la pena decirlas en el momento.`,
+      si: "Decí",
+      no: "Guardátelas"
+    },
+    {
+      texto: `La mayoría de las cosas interesantes pasan cuando no estás mirando.<br><br>Avisarte es opcional. Depende de vos.`,
+      si: "Avisame",
+      no: "No hace falta"
+    },
+  ];
+
+  const gancho = ganchos[Math.floor(Math.random() * ganchos.length)];
+
+  const overlay = document.createElement('div');
+  overlay.id = 'push-overlay';
+  overlay.style.cssText = `
+    position:fixed; inset:0; background:rgba(10,8,6,0.97);
+    z-index:8000; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; padding:48px;
+    opacity:0; transition:opacity 0.8s ease;
+  `;
+  overlay.innerHTML = `
+    <div style="max-width:420px; text-align:center;">
+      <div style="font-family:'Cormorant Garamond',serif;
+        font-size:clamp(19px,2.2vw,24px); font-weight:300; font-style:italic;
+        line-height:1.75; color:#b0a490; margin-bottom:44px;">
+        ${gancho.texto}
+      </div>
+      <div style="display:flex; gap:14px; justify-content:center; flex-wrap:wrap;">
+        <button onclick="acceptPush()" style="font-family:'JetBrains Mono',monospace;
+          font-size:10px; letter-spacing:2px; background:#d4a85a; color:#0a0806;
+          border:none; padding:14px 28px; cursor:pointer; text-transform:uppercase;
+          transition:opacity 0.2s;">
+          ${gancho.si}
+        </button>
+        <button onclick="declinePush()" style="font-family:'JetBrains Mono',monospace;
+          font-size:10px; letter-spacing:2px; background:none; color:#706050;
+          border:1px solid #302a20; padding:14px 28px; cursor:pointer;
+          text-transform:uppercase; transition:color 0.2s;">
+          ${gancho.no}
+        </button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  requestAnimationFrame(() => { overlay.style.opacity = '1'; });
+}
+
+async function acceptPush() {
+  document.getElementById('push-overlay')?.remove();
+  state.pushAsked = true;
+  save();
+  const permission = await Notification.requestPermission();
+  if (permission === 'granted') await subscribePush();
+}
+
+function declinePush() {
+  document.getElementById('push-overlay')?.remove();
+  state.pushAsked = true;
+  state.pushDeclined = true;
+  save();
+}
+
+async function subscribePush() {
+  try {
+    const reg = await navigator.serviceWorker.ready;
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub && VAPID_PUBLIC !== 'VAPID_PUBLIC_KEY_PLACEHOLDER') {
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC)
+      });
+    }
+    if (sub) {
+      state.pushSubscription = JSON.stringify(sub);
+      save();
+      schedulePushCheck();
+    }
+  } catch(e) {}
+}
+
+function urlBase64ToUint8Array(base64String) {
+  const padding = '='.repeat((4 - base64String.length % 4) % 4);
+  const base64 = (base64String + padding).replace(/-/g, '+').replace(/_/g, '/');
+  const rawData = atob(base64);
+  return new Uint8Array([...rawData].map(c => c.charCodeAt(0)));
+}
+
+// Scheduler local — chequea si Carlitos tiene que aparecer hoy
+function schedulePushCheck() {
+  const now = Date.now();
+  const last = state.lastPush || 0;
+  const hoursElapsed = (now - last) / (1000 * 60 * 60);
+
+  // Carlitos aparece una vez por día, a horario aleatorio entre 18-22hs
+  if (hoursElapsed < 20) return;
+  if (state.entries.length < 3) return;
+
+  const hour = new Date().getHours();
+  if (hour < 18 || hour > 22) return;
+
+  // 40% de chance de aparecer — escasez crea valor
+  if (Math.random() > 0.4) return;
+
+  sendLocalPush();
+}
+
+function sendLocalPush() {
+  const { title, body, cancion } = getMensajeConCancion();
+  state.cancionActual = cancion;
+  save();
+
+  navigator.serviceWorker.ready.then(reg => {
+    reg.showNotification(title, {
+      body,
+      icon: '/icon-192.png',
+      silent: true,
+      tag: 'carlitos-diario',
+      data: { url: '/' }
+    });
+  });
+
+  state.lastPush = Date.now();
+  save();
+}
+
 // ── BOOT ──────────────────────────────────────────────────────
 applyProState();
 unlockTabs();
@@ -2473,6 +2968,13 @@ checkOnboarding();
 checkInsightSchedule();
 checkReturnGreeting();
 checkWorldAlert();
+setTimeout(initPush, 5000);
+setTimeout(schedulePushCheck, 8000);
+
+// Presencia musical — solo si no es la primera visita
+if (state.entries.length > 0 && !state.onboardingDone === false) {
+  setTimeout(showMusicPresence, 800);
+}
 </script>
 </body>
 </html>
