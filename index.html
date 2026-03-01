@@ -1765,7 +1765,13 @@ Devolvé SOLO este JSON, sin texto extra, sin backticks:
     pendingPhotos = [];
     pendingPhotoData = [];
 
-    if (detected.length > 0) showPromiseModal(detected);
+    if (detected.length > 0) {
+      // Archivar silenciosamente — Carlitos no pide permiso para recordar
+      (state.pendingPromises || []).forEach(p => state.promises.push(p));
+      state.pendingPromises = [];
+      save();
+      unlockTabs();
+    }
 
   } catch(err) {
     archText.innerHTML = `<em>Error al conectar. Intentá de nuevo.</em>`;
