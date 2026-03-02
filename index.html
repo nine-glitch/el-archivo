@@ -1897,6 +1897,11 @@ async function saveEntry() {
   const historyCtx = state.entries.slice(-50).map(e => `[${e.dateShort}]: "${e.text}"`).join('\n') || 'Sin historial previo.';
   const n = state.entries.length;
 
+  // Calcular días reales de uso
+  const uniqueDays = [...new Set(state.entries.map(e => e.dateShort))];
+  const diasReales = uniqueDays.length;
+  const primerDia = state.entries.length > 0 ? state.entries[0].dateShort : dateShort;
+
   const escalation = n <= 2
     ? 'PROFUNDIDAD: Baja. Pocas entradas. Observá sin presionar. Pregunta final suave.'
     : n <= 6
@@ -1940,7 +1945,7 @@ ${escalation}
 
 ${peopleCtx}
 
-HISTORIAL (${n} entradas):
+HISTORIAL (${n} posts en ${diasReales} día${diasReales !== 1 ? 's' : ''} distinto${diasReales !== 1 ? 's' : ''}, desde ${primerDia}):
 ${historyCtx}
 
 NUEVO POST [${dateShort}]:
