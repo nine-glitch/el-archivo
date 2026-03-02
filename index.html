@@ -1156,24 +1156,27 @@ textarea:focus { border-color:var(--gold2); }
   background:var(--bg);
   border-top:1px solid var(--border);
   padding:9px 28px;
-  display:flex; align-items:center; justify-content:space-between;
+  display:grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items:center;
   z-index:100;
 }
 
 .footer-note {
   font-family:'JetBrains Mono', monospace;
   font-size:8px; color:var(--text3); letter-spacing:1px;
+  text-align:center;
 }
 
-.footer-btns { display:flex; gap:16px; align-items:center; }
+.footer-btns { display:flex; gap:16px; align-items:center; justify-content:flex-end; }
 
 .footer-btn {
   font-family:'JetBrains Mono', monospace;
   font-size:8px; letter-spacing:1px;
-  background:none; border:none; cursor:pointer;
+  background:none; border:none; cursor:pointer; color:var(--text3);
   padding:3px 0; transition:color 0.2s;
 }
-
+.footer-btn:hover { color:var(--text2); }
 .footer-btn.upgrade { color:var(--gold); border-bottom:1px solid var(--gold2); }
 .footer-btn.upgrade:hover { border-bottom-color:var(--gold); }
 .footer-btn.danger { color:var(--text3); }
@@ -1429,7 +1432,8 @@ textarea:focus { border-color:var(--gold2); }
 
 <!-- FOOTER -->
 <footer class="site-footer">
-  <span class="footer-note">Lo que escribís lo lee Carlitos, no su creador · Datos guardados localmente en tu navegador</span>
+  <button class="footer-btn" onclick="signOut()" id="signout-btn" style="display:none">↩ Salir</button>
+  <span class="footer-note">Lo que escribís lo lee Carlitos, no su creador</span>
   <div class="footer-btns">
     <button class="footer-btn" id="install-btn" onclick="installApp()" style="display:none">⊞ Instalar app</button>
     <button class="footer-btn upgrade" onclick="showUpgrade()">✦ Activar Pro</button>
@@ -1491,12 +1495,16 @@ function hideLoginScreen() {
 
 async function onUserReady() {
   hideLoginScreen();
-  // Sincronizar settings desde Supabase
+  document.getElementById('signout-btn').style.display = 'inline';
   await syncSettingsFromDB();
-  // Sincronizar posts desde Supabase
   await syncPostsFromDB();
-  // Mostrar nombre de usuario si hay
   updateUserHeader();
+}
+
+async function signOut() {
+  await supa.auth.signOut();
+  document.getElementById('signout-btn').style.display = 'none';
+  showLoginScreen();
 }
 
 function updateUserHeader() {
