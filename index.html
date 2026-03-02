@@ -51,6 +51,35 @@ body::after {
 
 .app { max-width:800px; margin:0 auto; padding:0 24px 120px; }
 
+/* ── SPLASH ── */
+#splash {
+  position:fixed; inset:0;
+  background:var(--bg);
+  z-index:99999;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  gap:16px;
+  transition:opacity 0.6s ease;
+}
+#splash.fade { opacity:0; pointer-events:none; }
+.splash-logo {
+  font-family:'Cormorant Garamond',serif;
+  font-size:32px; font-weight:300;
+  color:var(--text);
+}
+.splash-logo em { font-style:italic; color:var(--gold); }
+.splash-dots {
+  display:flex; gap:6px; align-items:center; height:16px;
+}
+.splash-dots span {
+  width:4px; height:4px;
+  background:var(--gold2);
+  border-radius:50%;
+  animation:ld 1.2s infinite;
+}
+.splash-dots span:nth-child(2){ animation-delay:0.2s; }
+.splash-dots span:nth-child(3){ animation-delay:0.4s; }
+
 /* ── HEADER ── */
 header {
   padding: 64px 0 48px;
@@ -1433,10 +1462,7 @@ textarea:focus { border-color:var(--gold2); }
 <!-- FOOTER -->
 <footer class="site-footer">
   <div class="footer-left">
-    <button class="footer-btn" onclick="signOut()" id="signout-btn" style="display:none">↩ Salir</button>
-  </div>
-  <div class="footer-center">
-    <span class="footer-note">Lo que escribís lo lee Carlitos, no su creador</span>
+    <button class="footer-btn upgrade" onclick="signOut()" id="signout-btn" style="display:none; color:var(--text3); border-bottom:1px solid var(--border2);">↩ Salir</button>
   </div>
   <div class="footer-btns">
     <button class="footer-btn" id="install-btn" onclick="installApp()" style="display:none">⊞ Instalar app</button>
@@ -1453,19 +1479,27 @@ const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
 
 let currentUser = null;
 
+function hideSplash() {
+  const s = document.getElementById('splash');
+  if (!s) return;
+  s.classList.add('fade');
+  setTimeout(() => s.remove(), 700);
+}
+
 async function initAuth() {
   // Verificar si hay sesión activa
   const { data: { session } } = await supa.auth.getSession();
   if (session?.user) {
     currentUser = session.user;
-    onUserReady();
+    await onUserReady();
   } else {
     // Chequear si viene de redirect OAuth
     const { data: { user } } = await supa.auth.getUser();
     if (user) {
       currentUser = user;
-      onUserReady();
+      await onUserReady();
     } else {
+      hideSplash();
       showLoginScreen();
     }
   }
@@ -1499,6 +1533,7 @@ function hideLoginScreen() {
 
 async function onUserReady() {
   hideLoginScreen();
+  hideSplash();
   document.getElementById('signout-btn').style.display = 'inline';
   await syncSettingsFromDB();
   await syncPostsFromDB();
