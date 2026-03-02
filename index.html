@@ -1156,11 +1156,11 @@ textarea:focus { border-color:var(--gold2); }
   background:var(--bg);
   border-top:1px solid var(--border);
   padding:9px 28px;
-  display:grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items:center;
+  display:flex; align-items:center; justify-content:space-between;
   z-index:100;
 }
+.footer-left { display:flex; align-items:center; min-width:80px; }
+.footer-center { flex:1; text-align:center; }
 
 .footer-note {
   font-family:'JetBrains Mono', monospace;
@@ -1248,21 +1248,21 @@ textarea:focus { border-color:var(--gold2); }
 
   <!-- HEADER -->
   <header>
+    <div id="music-presence-inline" style="display:none; align-items:center; gap:8px; opacity:0; transition:opacity 0.6s ease; margin-bottom:8px; min-width:0;">
+      <div id="mpi-bars" style="display:flex; gap:3px; align-items:flex-end; height:12px; flex-shrink:0;">
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
+        <span class="wave-bar"></span>
+      </div>
+      <div id="mpi-icon" style="display:none; font-size:13px; flex-shrink:0;">📖</div>
+      <div style="min-width:0; overflow:hidden;">
+        <div id="mpi-title" style="font-family:'Cormorant Garamond',serif; font-size:13px; font-style:italic; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
+        <div id="mpi-artist" style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; color:var(--text3); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
+      </div>
+    </div>
     <div class="logo-row">
       <div class="logo">Contale a <em>Carlitos</em></div>
       <span class="pro-badge" id="pro-badge">Pro</span>
-      <div id="music-presence-inline" style="display:none; align-items:center; gap:8px; margin-left:4px; opacity:0; transition:opacity 0.6s ease; flex:1; min-width:0;">
-        <div id="mpi-bars" style="display:flex; gap:3px; align-items:flex-end; height:12px; flex-shrink:0;">
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-          <span class="wave-bar"></span>
-        </div>
-        <div id="mpi-icon" style="display:none; font-size:13px; flex-shrink:0;">📖</div>
-        <div style="min-width:0; overflow:hidden;">
-          <div id="mpi-title" style="font-family:'Cormorant Garamond',serif; font-size:13px; font-style:italic; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
-          <div id="mpi-artist" style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; color:var(--text3); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;"></div>
-        </div>
-      </div>
     </div>
     <div class="tagline">Carlitos recuerda todo. <em>Todo.</em></div>
   </header>
@@ -1432,8 +1432,12 @@ textarea:focus { border-color:var(--gold2); }
 
 <!-- FOOTER -->
 <footer class="site-footer">
-  <button class="footer-btn" onclick="signOut()" id="signout-btn" style="display:none">↩ Salir</button>
-  <span class="footer-note">Lo que escribís lo lee Carlitos, no su creador</span>
+  <div class="footer-left">
+    <button class="footer-btn" onclick="signOut()" id="signout-btn" style="display:none">↩ Salir</button>
+  </div>
+  <div class="footer-center">
+    <span class="footer-note">Lo que escribís lo lee Carlitos, no su creador</span>
+  </div>
   <div class="footer-btns">
     <button class="footer-btn" id="install-btn" onclick="installApp()" style="display:none">⊞ Instalar app</button>
     <button class="footer-btn upgrade" onclick="showUpgrade()">✦ Activar Pro</button>
