@@ -9,6 +9,7 @@
   <meta name="apple-mobile-web-app-title" content="Carlitos">
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <title>Contale a Carlitos</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 <style>
 :root {
@@ -609,6 +610,80 @@ textarea:focus { border-color:var(--gold2); }
 
 .io-dismiss:hover { color:var(--text2); }
 
+
+/* ── LOGIN ────────────────────────────────────────────────────*/
+#login-screen {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 9999;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 32px;
+  gap: 32px;
+}
+#login-screen.visible { display: flex; }
+.login-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 300;
+  color: var(--text);
+}
+.login-logo em { font-style: italic; color: var(--gold); }
+.login-tagline {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--text3);
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 1.8;
+}
+.login-btn-google {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #1a1510;
+  border: 1px solid var(--border2);
+  color: var(--text2);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  padding: 14px 28px;
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s;
+  width: 100%;
+  max-width: 320px;
+  justify-content: center;
+}
+.login-btn-google:hover { border-color: var(--gold); color: var(--gold); }
+.login-privacy {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--text3);
+  text-align: center;
+  max-width: 280px;
+  line-height: 1.8;
+  text-transform: uppercase;
+}
+.login-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--text3);
+}
+#user-avatar {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+}
 /* ── ONBOARDING ── */
 #onboarding {
   position: fixed;
@@ -1302,6 +1377,17 @@ textarea:focus { border-color:var(--gold2); }
   <button class="ob-btn" id="ob-btn" onclick="obNext()">→</button>
 </div>
 
+<!-- LOGIN SCREEN -->
+<div id="login-screen">
+  <div class="login-logo">Contale a <em>Carlitos</em></div>
+  <div class="login-tagline">Él recuerda todo.<br>Pero primero necesita saber quién sos.</div>
+  <button class="login-btn-google" onclick="loginGoogle()">
+    <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+    Entrar con Google
+  </button>
+  <div class="login-privacy">Lo que escribís lo lee Carlitos, no su creador.<br>Tus datos son tuyos.</div>
+</div>
+
 <!-- WORLD ALERT -->
 <div id="world-alert">
   <div class="wa-eyebrow" id="wa-ey">Afuera está pasando algo</div>
@@ -1352,6 +1438,198 @@ textarea:focus { border-color:var(--gold2); }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
 <script>
+// ── SUPABASE ───────────────────────────────────────────────────
+const SUPA_URL = 'https://kgvqljposmghlaymhiii.supabase.co';
+const SUPA_KEY = 'sb_publishable_MYH0fYkXOYvIKk8I5zntPg_JdFnK0C6';
+const supa = supabase.createClient(SUPA_URL, SUPA_KEY);
+
+let currentUser = null;
+
+async function initAuth() {
+  // Verificar si hay sesión activa
+  const { data: { session } } = await supa.auth.getSession();
+  if (session?.user) {
+    currentUser = session.user;
+    onUserReady();
+  } else {
+    // Chequear si viene de redirect OAuth
+    const { data: { user } } = await supa.auth.getUser();
+    if (user) {
+      currentUser = user;
+      onUserReady();
+    } else {
+      showLoginScreen();
+    }
+  }
+
+  // Escuchar cambios de sesión
+  supa.auth.onAuthStateChange((event, session) => {
+    if (event === 'SIGNED_IN' && session?.user) {
+      currentUser = session.user;
+      onUserReady();
+    } else if (event === 'SIGNED_OUT') {
+      currentUser = null;
+      showLoginScreen();
+    }
+  });
+}
+
+async function loginGoogle() {
+  await supa.auth.signInWithOAuth({
+    provider: 'google',
+    options: { redirectTo: 'https://contaleacarlitos.vercel.app' }
+  });
+}
+
+function showLoginScreen() {
+  document.getElementById('login-screen').classList.add('visible');
+}
+
+function hideLoginScreen() {
+  document.getElementById('login-screen').classList.remove('visible');
+}
+
+async function onUserReady() {
+  hideLoginScreen();
+  // Sincronizar settings desde Supabase
+  await syncSettingsFromDB();
+  // Sincronizar posts desde Supabase
+  await syncPostsFromDB();
+  // Mostrar nombre de usuario si hay
+  updateUserHeader();
+}
+
+function updateUserHeader() {
+  if (!currentUser) return;
+  const name = currentUser.user_metadata?.full_name || currentUser.email;
+  const avatar = currentUser.user_metadata?.avatar_url;
+  // Solo un indicador sutil en el header
+  const badge = document.getElementById('pro-badge');
+  if (badge && state.isPro) badge.style.display = 'inline';
+}
+
+// ── SYNC SETTINGS ─────────────────────────────────────────────
+async function syncSettingsFromDB() {
+  if (!currentUser) return;
+  try {
+    const { data } = await supa.from('settings').select('*').eq('user_id', currentUser.id).single();
+    if (data) {
+      state.isPro = data.pro_status || false;
+      if (data.mood_cycle_start) state.firstUsed = data.mood_cycle_start;
+      if (data.push_asked !== undefined) state.pushAsked = data.push_asked;
+      if (data.push_declined !== undefined) state.pushDeclined = data.push_declined;
+      if (data.onboarding_done !== undefined) state.onboardingDone = data.onboarding_done;
+      save();
+    } else {
+      // Primera vez — crear settings
+      await supa.from('settings').insert({
+        user_id: currentUser.id,
+        pro_status: state.isPro || false,
+        mood_cycle_start: state.firstUsed || Date.now(),
+        onboarding_done: state.onboardingDone || false
+      });
+    }
+  } catch(e) { console.warn('settings sync error', e); }
+}
+
+async function saveSettingsToDB() {
+  if (!currentUser) return;
+  try {
+    await supa.from('settings').upsert({
+      user_id: currentUser.id,
+      pro_status: state.isPro || false,
+      mood_cycle_start: state.firstUsed || Date.now(),
+      push_asked: state.pushAsked || false,
+      push_declined: state.pushDeclined || false,
+      onboarding_done: state.onboardingDone || false,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'user_id' });
+  } catch(e) { console.warn('settings save error', e); }
+}
+
+// ── SYNC POSTS ────────────────────────────────────────────────
+async function syncPostsFromDB() {
+  if (!currentUser) return;
+  try {
+    const { data } = await supa
+      .from('posts')
+      .select('*')
+      .eq('user_id', currentUser.id)
+      .order('created_at', { ascending: true });
+
+    if (data && data.length > 0) {
+      // Convertir formato DB → formato local
+      const dbEntries = data.map(p => ({
+        id: p.id,
+        text: p.text,
+        dateShort: p.date_short,
+        archivista: p.archivista,
+        hook: p.hook,
+        tono: p.tono,
+        promises: p.promises || [],
+        people: p.people || [],
+        photos: p.photos || [],
+        pendingReaction: p.pending_reaction,
+        ts: new Date(p.created_at).getTime()
+      }));
+
+      // Merge: DB tiene más autoridad que localStorage
+      state.entries = dbEntries;
+      save();
+      renderRecentEntries();
+      renderAllEntries();
+    }
+
+    // Sincronizar promises
+    const { data: pData } = await supa
+      .from('promises')
+      .select('*')
+      .eq('user_id', currentUser.id);
+
+    if (pData && pData.length > 0) {
+      state.promises = pData.map(p => ({
+        id: p.id,
+        text: p.text,
+        status: p.status,
+        detectedAt: new Date(p.detected_at).getTime()
+      }));
+      save();
+    }
+  } catch(e) { console.warn('posts sync error', e); }
+}
+
+async function savePostToDB(entry) {
+  if (!currentUser) return null;
+  try {
+    const { data, error } = await supa.from('posts').insert({
+      user_id: currentUser.id,
+      text: entry.text,
+      date_short: entry.dateShort,
+      archivista: entry.archivista,
+      hook: entry.hook,
+      tono: entry.tono,
+      promises: entry.promises || [],
+      people: entry.people || [],
+      photos: [], // fotos por ahora sin subir a storage
+      pending_reaction: entry.pendingReaction || null
+    }).select().single();
+    if (data) return data.id;
+  } catch(e) { console.warn('post save error', e); }
+  return null;
+}
+
+async function savePromisesToDB(promises) {
+  if (!currentUser || !promises?.length) return;
+  try {
+    const rows = promises.map(p => ({
+      user_id: currentUser.id,
+      text: typeof p === 'string' ? p : p.text,
+      status: 'open'
+    }));
+    await supa.from('promises').insert(rows);
+  } catch(e) { console.warn('promises save error', e); }
+}
+
 // ── STATE ──────────────────────────────────────────────────────
 const SK = 'carlitos_v1';
 const EK = 'carlitos_ek';
@@ -1679,11 +1957,16 @@ Devolvé SOLO este JSON, sin texto extra, sin backticks:
       internal_themes: parsed.internal_themes || [],
       archivista: parsed.archivista || "",
       hook: parsed.hook || "",
+      tono: parsed.tono || "neutro",
       photos: pendingPhotos.slice()
     };
 
     state.entries.push(entry);
     trackCall();
+
+    // Guardar en Supabase
+    const dbId = await savePostToDB(entry);
+    if (dbId) entry.dbId = dbId;
 
     // Mostrar warning si está cerca del límite
     const afterCheck = checkLimit();
@@ -1697,6 +1980,8 @@ Devolvé SOLO este JSON, sin texto extra, sin backticks:
         date: dateShort, entryId: entry.id,
         status: 'open', createdAt: today.getTime()
       }));
+      // Guardar promises en Supabase
+      await savePromisesToDB(detected);
     }
 
     // Contradiction
@@ -3083,6 +3368,9 @@ setTimeout(schedulePushCheck, 8000);
 if (state.entries.length > 0 && !state.onboardingDone === false) {
   setTimeout(showMusicPresence, 800);
 }
+
+// Supabase auth — iniciar al cargar
+initAuth();
 </script>
 </body>
 </html>
