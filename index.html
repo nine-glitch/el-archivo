@@ -652,8 +652,11 @@ textarea:focus { border-color:var(--gold2); }
   justify-content: center;
   padding: 48px 32px;
   gap: 32px;
+  opacity: 1;
+  transition: opacity 0.6s ease;
 }
 #login-screen.visible { display: flex; }
+#login-screen.fading { opacity: 0; pointer-events: none; }
 .login-logo {
   font-family: 'Cormorant Garamond', serif;
   font-size: 36px;
@@ -1528,7 +1531,27 @@ function showLoginScreen() {
 }
 
 function hideLoginScreen() {
-  document.getElementById('login-screen').classList.remove('visible');
+  const screen = document.getElementById('login-screen');
+  if (!screen || !screen.classList.contains('visible')) return;
+
+  // Mostrar mensaje por 2.5s antes de fade
+  const tagline = screen.querySelector('.login-tagline');
+  if (tagline) {
+    tagline.style.transition = 'opacity 0.4s';
+    tagline.style.opacity = '0';
+    setTimeout(() => {
+      tagline.textContent = 'Él ya está recordando...';
+      tagline.style.opacity = '1';
+    }, 300);
+  }
+
+  setTimeout(() => {
+    screen.classList.add('fading');
+    setTimeout(() => {
+      screen.classList.remove('visible');
+      screen.classList.remove('fading');
+    }, 650);
+  }, 2000);
 }
 
 async function onUserReady() {
@@ -2209,7 +2232,7 @@ function entryHTML(e) {
 function renderRecentEntries() {
   const c = document.getElementById('recent-entries');
   const r = [...state.entries].reverse().slice(0, 5);
-  c.innerHTML = r.length ? r.map(entryHTML).join('') : '<div class="empty">Todavía no hay posts.</div>';
+  c.innerHTML = r.length ? r.map(entryHTML).join('') : '<div class="empty" style="font-family:\'Cormorant Garamond\',serif; font-style:italic; color:var(--text3); font-size:16px; padding:8px 0;">Escribí lo primero. Carlitos empieza de cero acá.</div>';
 }
 
 function renderAllEntries() {
