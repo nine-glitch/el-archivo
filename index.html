@@ -2318,7 +2318,13 @@ Reaccioná en UNA línea. Puede ser una pregunta retórica irónica, una observa
     msg = data.content?.[0]?.text?.trim() || '';
   } catch(e) {}
 
-  if (!msg) return;
+  if (!msg) {
+    // Fallback si falla la API
+    const fallbacks = ["¿Y cómo terminó eso?", "Ajá.", "Seguís igual, eh.", "mmm.", "¿En serio?", "jajaja", "uy."];
+    msg = fallbacks[Math.floor(Math.random() * fallbacks.length)];
+  }
+
+  msg = `<em>${msg}</em>`;
 
   // Aparece después de la presencia musical — 8.5s
   setTimeout(() => {
@@ -2735,12 +2741,12 @@ function showMusicPresence() {
   const el = document.createElement('div');
   el.id = 'music-presence';
   el.style.cssText = `
-    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
-    background:var(--card2); border:1px solid var(--border2);
-    padding:12px 20px; z-index:500;
+    position:fixed; top:0; left:0; right:0;
+    background:var(--card2); border-bottom:1px solid var(--border2);
+    padding:10px 24px; z-index:500;
     display:flex; align-items:center; gap:12px;
     opacity:0; transition:opacity 0.6s ease;
-    max-width:340px; width:calc(100% - 48px);
+    max-width:100%;
   `;
 
   if (presencia.tipo === 'musica') {
