@@ -1305,6 +1305,7 @@ textarea:focus { border-color:var(--gold2); }
     <div id="return-greeting"></div>
 
     <textarea id="entry-input" placeholder="Posteá. Él recuerda todo." maxlength="3000"></textarea>
+    <div id="usage-counter" style="font-family:'JetBrains Mono',monospace; font-size:8px; letter-spacing:1px; color:var(--text3); text-align:right; margin-top:6px; opacity:0; transition:opacity 0.3s;"></div>
 
     <!-- Photo upload (Pro only) -->
     <div class="photo-area" id="photo-area">
@@ -1838,6 +1839,24 @@ function checkLimit() {
 function showLimitWarning(calls, limit) {
   const remaining = limit - calls;
   showToast(`Carlitos te queda ${remaining} respuesta${remaining !== 1 ? 's' : ''} este mes.`);
+  updateUsageCounter();
+}
+
+function updateUsageCounter() {
+  const counter = document.getElementById('usage-counter');
+  if (!counter) return;
+  const month = getUsageMonth();
+  if (state.usage.month !== month) return; // sin uso este mes
+  const limit = state.isPro ? LIMITS.pro : LIMITS.free;
+  const calls = state.usage.calls || 0;
+  const remaining = limit - calls;
+  if (remaining <= limit * 0.5) { // solo mostrar cuando usó más de la mitad
+    counter.textContent = `${remaining}/${limit} este mes`;
+    counter.style.opacity = '1';
+    counter.style.color = remaining <= 5 ? 'var(--red)' : 'var(--text3)';
+  } else {
+    counter.style.opacity = '0';
+  }
 }
 
 function showLimitBlocked(limit) {
@@ -2058,17 +2077,35 @@ Devolvé SOLO este JSON, sin texto extra, sin backticks:
 
     msgContent.push({ type: 'text', text: prompt });
 
-    const res = await fetch("/api/proxy", {
-      method: "POST",
-      headers: getApiHeaders(),
-      body: JSON.stringify({
-        model: "claude-sonnet-4-6",
-        max_tokens: 1000,
-        messages: [{ role: "user", content: msgContent }]
-      })
-    });
+    // Toast "espera" si tarda más de 8s
+    const waitToastTimer = setTimeout(() => {
+      showToast('Carlitos está pensando más de lo normal...');
+    }, 8000);
 
-    const data = await res.json();
+    let res, data;
+    try {
+      res = await fetch("/api/proxy", {
+        method: "POST",
+        headers: getApiHeaders(),
+        body: JSON.stringify({
+          model: "claude-sonnet-4-6",
+          max_tokens: 1000,
+          messages: [{ role: "user", content: msgContent }]
+        })
+      });
+      clearTimeout(waitToastTimer);
+      data = await res.json();
+    } catch(fetchErr) {
+      clearTimeout(waitToastTimer);
+      archText.innerHTML = '<em style="color:var(--text3); font-style:italic;">Carlitos no puede responder ahora. Intentá en un momento.</em>';
+      return;
+    }
+
+    if (!res.ok || data.error) {
+      archText.innerHTML = '<em style="color:var(--text3); font-style:italic;">Carlitos no puede responder ahora. Intentá en un momento.</em>';
+      if (data.error === 'rate_limit') showToast('Demasiadas requests. Esperá un rato.');
+      return;
+    }
     const raw = data.content.map(i => i.text || "").join("");
 
     let parsed;
@@ -3493,6 +3530,7 @@ if (state.entries.length > 0 && !state.onboardingDone === false) {
 }
 
 // Supabase auth — iniciar al cargar
+updateUsageCounter();
 initAuth();
 </script>
 </body>
