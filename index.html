@@ -1535,9 +1535,48 @@ async function onUserReady() {
   hideLoginScreen();
   hideSplash();
   document.getElementById('signout-btn').style.display = 'inline';
-  await syncSettingsFromDB();
-  await syncPostsFromDB();
+  showSyncIndicator();
+  try {
+    await syncSettingsFromDB();
+    await syncPostsFromDB();
+    hideSyncIndicator();
+  } catch(e) {
+    hideSyncIndicator();
+    showToast('Error de conexión. Tus posts locales están intactos.');
+  }
   updateUserHeader();
+}
+
+function showSyncIndicator() {
+  let ind = document.getElementById('sync-indicator');
+  if (!ind) {
+    ind = document.createElement('div');
+    ind.id = 'sync-indicator';
+    ind.style.cssText = `
+      position:fixed; top:0; left:0; right:0; height:2px;
+      background: linear-gradient(90deg, transparent, #d4a85a, transparent);
+      background-size: 200% 100%;
+      animation: syncSlide 1.2s linear infinite;
+      z-index:99998;
+    `;
+    document.body.appendChild(ind);
+  }
+  // Agregar keyframe si no existe
+  if (!document.getElementById('sync-style')) {
+    const s = document.createElement('style');
+    s.id = 'sync-style';
+    s.textContent = '@keyframes syncSlide { 0%{background-position:200% 0} 100%{background-position:-200% 0} }';
+    document.head.appendChild(s);
+  }
+}
+
+function hideSyncIndicator() {
+  const ind = document.getElementById('sync-indicator');
+  if (ind) {
+    ind.style.transition = 'opacity 0.4s';
+    ind.style.opacity = '0';
+    setTimeout(() => ind.remove(), 400);
+  }
 }
 
 async function signOut() {
@@ -1559,7 +1598,8 @@ function updateUserHeader() {
 async function syncSettingsFromDB() {
   if (!currentUser) return;
   try {
-    const { data } = await supa.from('settings').select('*').eq('user_id', currentUser.id).single();
+    const { data, error } = await supa.from('settings').select('*').eq('user_id', currentUser.id).single();
+    if (error && error.code !== 'PGRST116') throw error; // PGRST116 = no rows, ok
     if (data) {
       state.isPro = data.pro_status || false;
       if (data.mood_cycle_start) state.firstUsed = data.mood_cycle_start;
@@ -1568,7 +1608,6 @@ async function syncSettingsFromDB() {
       if (data.onboarding_done !== undefined) state.onboardingDone = data.onboarding_done;
       save();
     } else {
-      // Primera vez — crear settings
       await supa.from('settings').insert({
         user_id: currentUser.id,
         pro_status: state.isPro || false,
@@ -1576,7 +1615,10 @@ async function syncSettingsFromDB() {
         onboarding_done: state.onboardingDone || false
       });
     }
-  } catch(e) { console.warn('settings sync error', e); }
+  } catch(e) {
+    console.warn('settings sync error', e);
+    throw e;
+  }
 }
 
 async function saveSettingsToDB() {
@@ -1598,14 +1640,15 @@ async function saveSettingsToDB() {
 async function syncPostsFromDB() {
   if (!currentUser) return;
   try {
-    const { data } = await supa
+    const { data, error } = await supa
       .from('posts')
       .select('*')
       .eq('user_id', currentUser.id)
       .order('created_at', { ascending: true });
 
+    if (error) throw error;
+
     if (data && data.length > 0) {
-      // Convertir formato DB → formato local
       const dbEntries = data.map(p => ({
         id: p.id,
         text: p.text,
@@ -1620,18 +1663,20 @@ async function syncPostsFromDB() {
         ts: new Date(p.created_at).getTime()
       }));
 
-      // Merge: DB tiene más autoridad que localStorage
       state.entries = dbEntries;
       save();
       renderRecentEntries();
       renderAllEntries();
+    } else if (data && data.length === 0 && state.entries.length === 0) {
+      // Primera vez — sin posts todavía, ok
     }
 
-    // Sincronizar promises
-    const { data: pData } = await supa
+    const { data: pData, error: pError } = await supa
       .from('promises')
       .select('*')
       .eq('user_id', currentUser.id);
+
+    if (pError) throw pError;
 
     if (pData && pData.length > 0) {
       state.promises = pData.map(p => ({
@@ -1642,7 +1687,10 @@ async function syncPostsFromDB() {
       }));
       save();
     }
-  } catch(e) { console.warn('posts sync error', e); }
+  } catch(e) {
+    console.warn('posts sync error', e);
+    throw e;
+  }
 }
 
 async function savePostToDB(entry) {
