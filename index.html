@@ -1295,6 +1295,7 @@ textarea:focus { border-color:var(--gold2); }
     <div class="logo-row">
       <div class="logo">Contale a <em>Carlitos</em></div>
       <span class="pro-badge" id="pro-badge">Pro</span>
+      <span id="mood-icon" title="Estado de Carlitos" style="font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:1px; color:var(--text3); margin-left:4px; cursor:default;"></span>
     </div>
     <div class="tagline">Carlitos recuerda todo. <em>Todo.</em></div>
   </header>
@@ -1403,6 +1404,7 @@ textarea:focus { border-color:var(--gold2); }
         Después de suscribirte, activá Pro con el código que recibís por email.
       </div>
       <button class="upgrade-close" onclick="closeUpgrade()">Quedarme en la versión gratuita</button>
+      <button class="upgrade-close" onclick="togglePushOptOut()" id="push-optout-btn" style="margin-top:4px; font-size:9px; letter-spacing:1px; opacity:0.5;"></button>
     </div>
   </div>
 </div>
@@ -2591,7 +2593,6 @@ function checkInsightSchedule() {
 }
 
 // ── UPGRADE ───────────────────────────────────────────────────
-function showUpgrade() { document.getElementById('upgrade-screen').classList.add('visible'); }
 function closeUpgrade() { document.getElementById('upgrade-screen').classList.remove('visible'); }
 
 // Activation code (simple — in production this would be server-side)
@@ -3281,8 +3282,8 @@ function maybeTriggerMicroFeedback() {
     return;
   }
 
-  // Si no hay reacción pendiente — 30% de chance de aparecer con algo igual
-  if (Math.random() > 0.3) return;
+  // Si no hay reacción pendiente — 10% de chance de aparecer con algo
+  if (Math.random() > 0.10) return;
   if (state.entries.length < 2) return;
 
   const microApariciones = [
@@ -3531,6 +3532,38 @@ if (state.entries.length > 0 && !state.onboardingDone === false) {
 
 // Supabase auth — iniciar al cargar
 updateUsageCounter();
+updateMoodIcon();
+
+function updateMoodIcon() {
+  const el = document.getElementById('mood-icon');
+  if (!el || state.entries.length < 3) return;
+  const mood = getCurrentMood();
+  const icons = { filoso: '◈', tierno: '◌', dark: '◆', ironico: '◇' };
+  const labels = { filoso: 'filoso', tierno: 'tierno', dark: 'oscuro', ironico: 'irónico' };
+  el.textContent = icons[mood] || '';
+  el.title = `Carlitos está ${labels[mood] || mood} esta semana`;
+}
+
+function togglePushOptOut() {
+  state.pushDeclined = !state.pushDeclined;
+  save();
+  saveSettingsToDB();
+  updatePushOptOutBtn();
+  showToast(state.pushDeclined ? 'Notificaciones desactivadas.' : 'Notificaciones activadas.');
+}
+
+function updatePushOptOutBtn() {
+  const btn = document.getElementById('push-optout-btn');
+  if (!btn) return;
+  btn.textContent = state.pushDeclined
+    ? 'Activar notificaciones de Carlitos'
+    : 'Desactivar notificaciones de Carlitos';
+}
+
+function showUpgrade() {
+  document.getElementById('upgrade-screen').classList.add('visible');
+  updatePushOptOutBtn();
+}
 initAuth();
 </script>
 </body>
